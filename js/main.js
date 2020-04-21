@@ -102,14 +102,14 @@ Vue.component("side-menu-tag", {
 Vue.component("nav-tag", {
   template: `<div class="wrapper" id="nav">
                 <div class="left-nav" :class="{'active':isOpenSideMenu}">
-                    <a href="javascipt:;" @click="openMenu"><i :class="leftIcons"></i></a>
+                    <a href="javascript:;" @click="openMenu"><i :class="leftIcons"></i></a>
                 </div>
                 <div class="right-nav">
                     <a href="javascript:;" @click=changeView(i.c_name) v-for="(i,idx) in rightIcons1" :key="idx" @blur="isOpenLangs=false;isLogout=false">
                       <i :class="i.icon"></i>
                       <span>{{i.name}}</span>
                     </a>
-                    <a href="javascipt:;" v-for="(i,idx) in rightIcons2" @click="openLang(idx),openLogout(idx)" @blur="isOpenLangs=false;isLogout=false"><i :class="i.icon"></i><span>{{i.name}}</span></a>
+                    <a href="javascript:;" v-for="(i,idx) in rightIcons2" @click="openLang(idx),openLogout(idx)" @blur="isOpenLangs=false;isLogout=false"><i :class="i.icon"></i><span>{{i.name}}</span></a>
                     <div class="lang" :class="{'active': isOpenLangs}">
                         <p v-for="l in langs"><span>{{l.abbrr}}</span>{{l.name}}</p>
                     </div>
@@ -624,7 +624,7 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
   components: {
     pricing: {
       template: `<div id="pricing">
-                  <h2>{{title}}</h2>
+                  <h1>{{title}}</h1>
                   <div class="col-lg-3">
                     <div class="card-title">
                       <h3>{{free_t}}</h3>
@@ -756,7 +756,9 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
               <div class="wrapper">
                 <div class="container">
                   <div class="col-lg-12">
-                    <button @click="changeView(t.c_name)" v-for="t in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
+                    <div class="button">
+                      <button @click="changeView(t.c_name)" v-for="t in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
+                    </div>
                     <component :is="view"/>
                   </div>
                 </div>
@@ -765,11 +767,10 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
   data() {
     return {
       isOpen: false,
-      title: "施工中",
       view: "basic_info",
       tabs: [
         { c_name: "basic_info", name: "商品設定", icon: "fas fa-cog" },
-        { c_name: "shipping", name: "取貨方式", icon: "fas fa-track" },
+        { c_name: "shipping", name: "取貨方式", icon: "fas fa-truck" },
         { c_name: "payment", name: "支付方式", icon: "fas fa-money-check-alt" },
         {
           c_name: "productsettings",
@@ -781,7 +782,7 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
   },
   components: {
     basic_info: {
-      template: `<div id="basic_info">
+      template: `<div id="basic_info" class="clearfix">
                   <div class="col-lg-12">
                     <div class="card-title">
                       <h2>{{title}}</h2>
@@ -791,6 +792,7 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
                       <input type="text" v-model="shop_name">
                       <label>{{shop_label[1]}}</label>
                       <input type="text" v-model="shop_mail">
+                      <label>{{shop_label[2]}}</label>
                       <select>
                         <option value="">--請選擇--</option>
                         <option v-for="s in shop_type" value="s">{{s}}</option>
@@ -804,7 +806,7 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
       data() {
         return {
           title: "商店設定",
-          shop_label: ["商店名稱", "商店電郵"],
+          shop_label: ["商店名稱", "商店電郵", "選擇商店類型"],
           shop_name: "J商店測試",
           shop_mail: "j@gmail.com",
           shop_type: ["動物、寵物用品", "健康、美容", "電子產品"],
@@ -813,13 +815,13 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
       },
     },
     shipping: {
-      template: `<div id="shipping">
-                  <div class="col-lg-12">
+      template: `<div id="shipping" class="clearfix">
+                  <div class="col-lg-12 row1">
+                    <h1>{{title}}</h1>
+                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                  </div>
+                  <div class="col-lg-12 row2">
                     <table>
-                      <tr>
-                        <h1>{{title}}</h1>
-                        <button><i :class="button.icon"></i>{{button.name}}</button>
-                      </tr>
                       <tr>
                         <th v-for="t in thead" :width="t.width">{{t.name}}</th>
                       </tr>
@@ -883,13 +885,13 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
       },
     },
     payment: {
-      template: `<div id="payment">
-                  <div class="col-lg-12">
+      template: `<div id="payment" class="clearfix">
+                  <div class="col-lg-12 row1">
+                    <h1>{{title}}</h1>
+                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                  </div>
+                  <div class="col-lg-12 row2">
                     <table>
-                      <tr>
-                        <h1>{{title}}</h1>
-                        <button><i :class="button.icon"></i>{{button.name}}</button>
-                      </tr>
                       <tr>
                         <th v-for="t in thead" :width="t.width">{{t.name}}</th>
                       </tr>
@@ -909,7 +911,7 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
                 </div>`,
       data() {
         return {
-          title: "設定商店的取貨方式",
+          title: "設定你接受的付款方式",
           button: { name: "新增", icon: "fas fa-plus" },
           thead: [
             { name: "支付方式", width: "20%" },
@@ -919,8 +921,8 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
           ],
           payments: [
             {
-              name: "快快快遞(假)",
-              claim: "購買滿$300包郵，$300以下運貨到付",
+              name: "銀行轉帳(假)",
+              claim: "請於下單後3天內轉帳至銀行戶口",
               status: "開啟中",
               actions: [
                 { icon: "fas fa-edit", action: "編輯" },
@@ -929,18 +931,8 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
               ],
             },
             {
-              name: "快慢快遞(假)",
-              claim: "購買滿$600包郵，$600以下運貨到付",
-              status: "開啟中",
-              actions: [
-                { icon: "fas fa-edit", action: "編輯" },
-                { icon: "fas fa-ban", action: "啟用/停用" },
-                { icon: "fas fa-trash-alt", action: "刪除" },
-              ],
-            },
-            {
-              name: "慢慢快遞(假)",
-              claim: "購買滿$1000包郵，$1000以下運貨到付",
+              name: "超商付款(假)",
+              claim: "於各大超商，進行繳款付帳動作",
               status: "開啟中",
               actions: [
                 { icon: "fas fa-edit", action: "編輯" },
@@ -953,30 +945,40 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
       },
     },
     productsettings: {
-      template: `<div id="productsettings">
+      template: `<div id="productsettings" class="clearfix">
                   <div class="col-lg-12">
                     <h3>{{title}}</h3>
                   </div>
-                  <div class="col-lg-12" v-for="s in settings">
+                  <div class="col-lg-12 setting" v-for="s in settings" :class="[s.classname,{'active':s.isOpen}]" @click="s.isOpen = !s.isOpen">
                     <div class="card-title">
                       <p>
                         <span>{{s.status}}</span>
                         {{s.item}}
                       </p>
-                      <i :class="s.actionicon"><span>{{s.actionname}}</span></i>
+                      <a href="javascript:;">
+                            <i :class="s.actionicon"/>
+                            <span>{{s.actionname}}</span>
+                      </a>
                     </div>
                     <div class="card-body">
-                      <input type="checkbox">
-                      <label>{{s.item}}</label>
+                      <label class="checkbox">
+                        <input type="checkbox">
+                        <span class="knob"/>
+                        <span class="bg"/>
+                      </label>
+                      <label class="content">{{s.item}}</label>
                       <button>{{s.button}}</button>
                     </div>
                   </div>
                 </div>`,
       data() {
         return {
+          open: false,
           title: "以下設定會顯示於商品詳情頁面內：",
           settings: [
             {
+              isOpen: false,
+              classname: "item1",
               status: "已停用",
               item: "顯示商品庫存數量",
               actionname: "編輯",
@@ -984,6 +986,8 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
               button: "更新",
             },
             {
+              isOpen: false,
+              classname: "item2",
               status: "已停用",
               item: "顯示已售商品數量",
               actionname: "編輯",
@@ -991,6 +995,8 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
               button: "更新",
             },
             {
+              isOpen: false,
+              classname: "item3",
               status: "已停用",
               item: "購買須知",
               actionname: "編輯",
@@ -1025,7 +1031,9 @@ const teammateTag = Vue.component("teammate-tag", {
               <div class="wrapper">
                 <div class="container">
                   <div class="col-lg-12">
-                    <button @click="changeView(t.c_name)" v-for="t in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
+                    <div class="button">
+                      <button @click="changeView(t.c_name)" v-for="t in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
+                    </div>
                     <component :is="view"/>
                   </div>
                 </div>
@@ -1055,8 +1063,8 @@ const teammateTag = Vue.component("teammate-tag", {
                         <th v-for="t in thead">{{t}}</th>
                       </tr>
                       <tr v-for="a in admins">
-                        <td><i :class="a.icon"><span class="name">{{a.name}}</span><span class="level">{{a.level}}</span></i></td>
-                        <td><span :classs="a.status1">{{a.status2}}</span></td>
+                        <td><i :class="a.icon"><span class="name">{{a.name}}</span><span :class="a.level[1]">{{a.level[0]}}</span></i></td>
+                        <td><span :class="a.status[1]">{{a.status[0]}}</span></td>
                         <td> 
                           <a href="javascript:;">
                             <i :class="a.a_icon"/>
@@ -1079,20 +1087,18 @@ const teammateTag = Vue.component("teammate-tag", {
             {
               icon: "fas fa-user-circle",
               name: "新管理者",
-              level: null,
-              status1: "wait",
-              status2: "等待中",
+              level: [null, "none"],
+              status: ["等待中", "wait"],
               action: "刪除",
               a_icon: "fas fa-trash-alt",
             },
             {
               icon: "fas fa-user-circle",
               name: "Jacko",
-              level: "擁有者",
-              status1: "active",
-              status2: "啟用",
+              level: ["擁有者", "level"],
+              status: ["啟用", "active"],
               action: null,
-              a_icon: null,
+              a_icon: "none",
             },
           ],
           pages: [10, 20, 50, 100],
@@ -1102,12 +1108,12 @@ const teammateTag = Vue.component("teammate-tag", {
     },
     helper: {
       template: `<div id="helper">
+                  <div class="col-lg-12 row1">
+                    <h1>{{title}}</h1>
+                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                  </div>
                   <div class="col-lg-12 row2">
                     <table>
-                      <tr colspan="6">
-                        <h1>{{title}}</h1>
-                        <button><i :class="button.icon"></i>{{button.name}}</button>
-                      </tr>
                       <tr>
                         <th v-for="t in thead" :width="t.width">{{t.name}}</th>
                       </tr>
@@ -1125,9 +1131,9 @@ const teammateTag = Vue.component("teammate-tag", {
           title: "工作人員",
           button: { name: "新增", icon: "fas fa-plus" },
           thead: [
-            { name: "帳號", width: "80%" },
-            { name: "狀態", width: "10%" },
-            { name: "操作", width: "10%" },
+            { name: "帳號", width: "70%" },
+            { name: "狀態", width: "15%" },
+            { name: "操作", width: "15%" },
           ],
           result: "No data available",
           pages: [10, 20, 50, 100],
