@@ -209,11 +209,11 @@ const indexTag = Vue.component("index-tag", {
   template: `<div id="index" :class="{'active':isOpen}">
               <div class="wrapper">
                 <div class="container">
-                  <div class="col-lg-12">
+                  <div class="col-12">
                     <h1>{{title}}</h1>
                   </div>
-                  <div class="col-lg-12">
-                    <div class="col-lg-3" v-for="c in cards">
+                  <div class="col-12">
+                    <div class="co1-12 col-md-5 col-lg-3" v-for="c in cards">
                       <p>{{c.item}}</p>
                       <h2><span v-if="c.currency">{{c.currency}}</span>{{c.num}}</h2>
                     </div>
@@ -293,7 +293,7 @@ const helpCenterTag = Vue.component("help-center-tag", {
   template: `<div id="help-center" :class="{'active':isOpen}">
               <div class="wrapper">
                 <div class="container">
-                  <div class="col-lg-12" v-for="s in sections">
+                  <div class="col-12" v-for="s in sections">
                     <a href="javascript:;">
                       <div class="col-lg-2">
                         <i :class="s.icon"></i>
@@ -301,7 +301,7 @@ const helpCenterTag = Vue.component("help-center-tag", {
                       <div class="col-lg-10">
                         <h3>{{s.title}}</h3>
                         <p>{{s.content}}</p>
-                        <div class="col-lg-12 inner">
+                        <div class="col-12 inner">
                           <div>
                             <i :class="u" v-for="u in s.usersicons"></i>
                           </div>
@@ -367,10 +367,10 @@ const notificationsTag = Vue.component("notifications-tag", {
   template: `<div id="noti" :class="{'active':isOpen}">
               <div class="wrapper">
                 <div class="container">
-                  <div class="col-lg-12">
+                  <div class="col-12">
                     <h1>{{title}}</h1>
                   </div>
-                  <div class="col-lg-12">
+                  <div class="col-12">
                     <p>{{content}}</p>
                     <button disabled>{{button}}</button>
                   </div>
@@ -404,17 +404,17 @@ const ordersTag = Vue.component("orders-tag", {
   template: `<div id="orders" :class="{'active':isOpen}">
               <div class="wrapper">
                 <div class="container">
-                  <div class="col-lg-12">
+                  <div class="col-12">
                     <h1>{{title}}</h1>
                   </div>
-                  <div class="col-lg-12 row1">
+                  <div class="col-12 row1">
                     <div>
                       <i :class="searchIcons"/>
                       <input type="text" :placeholder="placeholder">
                     </div>
                     <button><i :class="filter.icon"></i>{{filter.name}}</button>
                   </div>
-                  <div class="col-lg-12 row2">
+                  <div class="col-12 row2">
                     <table>
                       <tr>
                         <th v-for="t in thead">{{t}}</th>
@@ -470,11 +470,11 @@ const productsTag = Vue.component("products-tag", {
   template: `<div id="products" :class="{'active':isOpen}">
               <div class="wrapper">
                 <div class="container">
-                  <div class="col-lg-12 row1">
+                  <div class="col-12 row1">
                     <h1>{{title}}</h1>
                     <button><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
-                  <div class="col-lg-12 row2">
+                  <div class="col-12 row2">
                     <table>
                       <tr>
                         <th v-for="t in thead" :width="t.width">{{t.name}}</th>
@@ -551,11 +551,11 @@ const promoCodeTag = Vue.component("promo-code-tag", {
   template: `<div id="promo-code" :class="{'active':isOpen}">
               <div class="wrapper">
                 <div class="container">
-                  <div class="col-lg-12 row1">
+                  <div class="col-12 row1">
                     <h1>{{title}}</h1>
                     <button><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
-                  <div class="col-lg-12 row2">
+                  <div class="col-12 row2">
                     <table>
                       <tr>
                         <th v-for="t in thead">{{t}}</th>
@@ -601,7 +601,7 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
   template: `<div id="sub-plan" :class="{'active':isOpen}">
               <div class="wrapper">
                 <div class="container">
-                  <div class="col-lg-12">
+                  <div class="col-12">
                     <div class="button">
                       <button @click="changeView(t.c_name)" v-for="t in tabs" :key="t.name"><i :class="t.icon"></i><span>{{t.name}}</span></button>
                     </div>
@@ -755,7 +755,7 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
   template: `<div id="shop" :class="{'active':isOpen}">
               <div class="wrapper">
                 <div class="container">
-                  <div class="col-lg-12">
+                  <div class="col-12">
                     <div class="button">
                       <button @click="changeView(t.c_name)" v-for="t in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
                     </div>
@@ -783,7 +783,7 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
   components: {
     basic_info: {
       template: `<div id="basic_info" class="clearfix">
-                  <div class="col-lg-12">
+                  <div class="col-12">
                     <div class="card-title">
                       <h2>{{title}}</h2>
                     </div>
@@ -816,11 +816,11 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
     },
     shipping: {
       template: `<div id="shipping" class="clearfix">
-                  <div class="col-lg-12 row1">
+                  <div class="col-12 row1">
                     <h1>{{title}}</h1>
                     <button><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
-                  <div class="col-lg-12 row2">
+                  <div class="col-12 row2">
                     <table>
                       <tr>
                         <th v-for="t in thead" :width="t.width">{{t.name}}</th>
@@ -886,11 +886,11 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
     },
     payment: {
       template: `<div id="payment" class="clearfix">
-                  <div class="col-lg-12 row1">
+                  <div class="col-12 row1">
                     <h1>{{title}}</h1>
                     <button><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
-                  <div class="col-lg-12 row2">
+                  <div class="col-12 row2">
                     <table>
                       <tr>
                         <th v-for="t in thead" :width="t.width">{{t.name}}</th>
@@ -946,10 +946,10 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
     },
     productsettings: {
       template: `<div id="productsettings" class="clearfix">
-                  <div class="col-lg-12">
+                  <div class="col-12">
                     <h3>{{title}}</h3>
                   </div>
-                  <div class="col-lg-12 setting" v-for="s in settings" :class="[s.classname,{'active':s.isOpen}]" @click="s.isOpen = !s.isOpen">
+                  <div class="col-12 setting" v-for="s in settings" :class="[s.classname,{'active':s.isOpen}]" @click="s.isOpen = !s.isOpen">
                     <div class="card-title">
                       <p>
                         <span>{{s.status}}</span>
@@ -1030,7 +1030,7 @@ const teammateTag = Vue.component("teammate-tag", {
   template: `<div id="teammate" :class="{'active':isOpen}">
               <div class="wrapper">
                 <div class="container">
-                  <div class="col-lg-12">
+                  <div class="col-12">
                     <div class="button">
                       <button @click="changeView(t.c_name)" v-for="t in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
                     </div>
@@ -1053,11 +1053,11 @@ const teammateTag = Vue.component("teammate-tag", {
   components: {
     admin: {
       template: `<div id="admin">
-                  <div class="col-lg-12 row1">
+                  <div class="col-12 row1">
                     <h1>{{title}}</h1>
                     <button><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
-                  <div class="col-lg-12 row2">
+                  <div class="col-12 row2">
                     <table>
                       <tr>
                         <th v-for="t in thead">{{t}}</th>
@@ -1108,11 +1108,11 @@ const teammateTag = Vue.component("teammate-tag", {
     },
     helper: {
       template: `<div id="helper">
-                  <div class="col-lg-12 row1">
+                  <div class="col-12 row1">
                     <h1>{{title}}</h1>
                     <button><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
-                  <div class="col-lg-12 row2">
+                  <div class="col-12 row2">
                     <table>
                       <tr>
                         <th v-for="t in thead" :width="t.width">{{t.name}}</th>
