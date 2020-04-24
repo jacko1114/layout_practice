@@ -604,7 +604,7 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
                 <div class="container">
                   <div class="col-12">
                     <div class="button">
-                      <button @click="changeView(t.c_name)" v-for="t in tabs" :key="t.name"><i :class="t.icon"></i><span>{{t.name}}</span></button>
+                      <button @click="changeView(t.c_name)" v-for="t in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
                     </div>
                     <component :is="view"/>
                   </div>
