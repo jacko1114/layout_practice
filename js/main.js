@@ -10,11 +10,12 @@ Vue.component("side-menu-tag", {
                     <div class="side-menu-section" v-for="b in blocks">
                         <p>{{b.name}}</p>
                         <a href="javascript:;" :key="idx" v-for="(st,idx) in b.subIcons">
-                          <span @click="changeView(st.c_name)">
-                            <i :class="st.icon"></i>
-                          {{st.title}}
-                          </span>
-                          </a>
+                          <i :class="st.icon" @click="changeView(st.c_name)">
+                            <span>
+                              {{st.title}}
+                            </span>
+                          </i>
+                        </a>
                     </div>
                 </div>
             </div>`,
@@ -213,7 +214,7 @@ const indexTag = Vue.component("index-tag", {
                     <h1>{{title}}</h1>
                   </div>
                   <div class="col-12">
-                    <div class="co1-12 col-md-5 col-lg-3" v-for="c in cards">
+                    <div class="col-11 col-md-5 col-lg-3" v-for="c in cards">
                       <p>{{c.item}}</p>
                       <h2><span v-if="c.currency">{{c.currency}}</span>{{c.num}}</h2>
                     </div>
@@ -257,7 +258,7 @@ const mainDirectoryTag = Vue.component("main-directory-tag", {
   template: `<div id="main-directory" :class="{'active':isOpen}">
               <div class="wrapper">
                 <div class="container">
-                  <div class="col-lg-2" :class="a.order" v-for="a in accounts">
+                  <div class="col-6 col-lg-2" :class="a.order" v-for="a in accounts">
                     <i :class="a.user"></i>
                     <p>{{a.content}}</p>
                   </div>
@@ -295,10 +296,10 @@ const helpCenterTag = Vue.component("help-center-tag", {
                 <div class="container">
                   <div class="col-12" v-for="s in sections">
                     <a href="javascript:;">
-                      <div class="col-lg-2">
-                        <i :class="s.icon"></i>
+                      <div class="col-11 col-lg-2">
+                        <i :class="s.icon"/>
                       </div>
-                      <div class="col-lg-10">
+                      <div class="col-10 col-lg-10">
                         <h3>{{s.title}}</h3>
                         <p>{{s.content}}</p>
                         <div class="col-12 inner">
@@ -658,7 +659,7 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
                         <p v-for="f in pro_features"><i :class="f.icon"></i>{{f.content}}</p>
                       </div>
                     </div>
-                    <div class="card-footer2">
+                    <div class="card-footer2 clearfix">
                       <button class="levelup">{{button}}</button>
                     </div>
                   </div>
