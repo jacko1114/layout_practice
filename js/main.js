@@ -626,7 +626,7 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
     pricing: {
       template: `<div id="pricing">
                   <h1>{{title}}</h1>
-                  <div class="col-lg-3">
+                  <div class="col-3 col-lg-3">
                     <div class="card-title">
                       <h3>{{free_t}}</h3>
                       <span>{{free_a}}</span>
@@ -642,7 +642,7 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
                       <p>{{free_content[1]}}<span class="heightlight">{{free_maxnum_h}}</span>{{free_content[2]}}</p>
                     </div>
                   </div>
-                  <div class="col-lg-8">
+                  <div class="col-8 col-lg-8">
                     <div class="card-title">
                       <h3>{{pro_t}}</h3>
                       <span>{{pro_a}}</span>
