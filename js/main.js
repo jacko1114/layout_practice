@@ -7,10 +7,10 @@ Vue.component("side-menu-tag", {
                     <p>{{header.name}}</p>
                 </div>
                 <div class="side-menu-contents">
-                    <div class="side-menu-section" v-for="b in blocks">
+                    <div class="side-menu-section" v-for="(b,idx1) in blocks">
                         <p>{{b.name}}</p>
-                        <a href="javascript:;" :key="idx" v-for="(st,idx) in b.subIcons">
-                          <i :class="st.icon" @click="changeView(st.c_name)">
+                        <a href="javascript:;" :key="idx2" v-for="(st,idx2) in b.subIcons" :class="{'active':st.active}">
+                          <i :class="st.icon" @click="changeView(st.c_name);changeTag(idx1,idx2)">
                             <span>
                               {{st.title}}
                             </span>
@@ -30,17 +30,29 @@ Vue.component("side-menu-tag", {
         {
           name: "管理",
           subIcons: [
-            { title: "首頁", icon: "fas fa-house-user", c_name: "indexTag" },
+            {
+              title: "首頁",
+              icon: "fas fa-house-user",
+              c_name: "indexTag",
+              active: true,
+            },
             {
               title: "商品",
               icon: "fas fa-box-open",
               c_name: "productsTag",
+              active: false,
             },
-            { title: "訂單", icon: "fas fa-folder", c_name: "ordersTag" },
+            {
+              title: "訂單",
+              icon: "fas fa-folder",
+              c_name: "ordersTag",
+              active: false,
+            },
             {
               title: "優惠碼",
               icon: "fas fa-star-of-david",
               c_name: "promoCodeTag",
+              active: false,
             },
           ],
         },
@@ -51,16 +63,19 @@ Vue.component("side-menu-tag", {
               title: "商店設定",
               icon: "fas fa-wrench",
               c_name: "shopSettingsTag",
+              active: false,
             },
             {
               title: "訂閱計畫",
               icon: "fas fa-star",
               c_name: "subscriptionPlanTag",
+              active: false,
             },
             {
               title: "人員管理",
               icon: "fas fa-user-cog",
               c_name: "teammateTag",
+              active: false,
             },
           ],
         },
@@ -71,6 +86,7 @@ Vue.component("side-menu-tag", {
               title: "通知設定",
               icon: "fas fa-bell",
               c_name: "notificationsTag",
+              active: false,
             },
           ],
         },
@@ -94,6 +110,16 @@ Vue.component("side-menu-tag", {
       vm.$emit("close-SM", this.isOpen);
       vm.$emit("change-V", v);
     },
+    changeTag(idx1, idx2) {
+      let l = this.blocks.length;
+      for (let i = 0; i < l; i++) {
+        let z = this.blocks[i].subIcons.length;
+        for (let x = 0; x < z; x++) {
+          this.blocks[i].subIcons[x].active = false;
+        }
+      }
+      this.blocks[idx1].subIcons[idx2].active = true;
+    },
   },
   mounted() {
     this.open();
@@ -107,15 +133,15 @@ Vue.component("nav-tag", {
                       <a href="javascript:;" @click="openMenu"><i :class="leftIcons"></i></a>
                   </div>
                   <div class="right-nav">
-                      <a href="javascript:;" @click=changeView(i.c_name) v-for="(i,idx) in rightIcons1" :key="idx" @blur="isOpenLangs=false;isLogout=false">
+                      <a href="javascript:;" @click=changeView(i.c_name) v-for="(i,idx) in rightIcons1" :key="idx">
                         <i :class="i.icon"></i>
                         <span>{{i.name}}</span>
                       </a>
-                      <a href="javascript:;" v-for="(i,idx) in rightIcons2" @click="openLang(idx),openLogout(idx)" @blur="isOpenLangs=false;isLogout=false"><i :class="i.icon"></i><span>{{i.name}}</span></a>
-                      <div class="lang" :class="{'active': isOpenLangs}">
-                          <p v-for="l in langs"><span>{{l.abbrr}}</span>{{l.name}}</p>
+                      <a href="javascript:;" v-for="(i,idx) in rightIcons2" @click="openLang(idx),openLogout(idx)"><i :class="i.icon"></i><span>{{i.name}}</span></a>
+                      <div class="lang" :class="{'active': isOpenLangs}" ref="lang">
+                          <p v-for="(l,idx) in langs" :class="{'active': l.active}" @click="changeLang(idx)"><span>{{l.abbrr}}</span>{{l.name}}</p>
                       </div>
-                      <div class="logout" :class="{'active': isLogout}" >
+                      <div class="logout" :class="{'active': isLogout}" ref="logout">
                           <p>{{logout}}</p>
                       </div>
                     </div>
@@ -145,8 +171,8 @@ Vue.component("nav-tag", {
         { name: "登出", icon: "fas fa-user-circle" },
       ],
       langs: [
-        { abbrr: "Zh", name: "繁體中文" },
-        { abbrr: "En", name: "English" },
+        { abbrr: "Zh", name: "繁體中文", active: true },
+        { abbrr: "En", name: "English", active: false },
       ],
       logout: "登出",
     };
@@ -156,7 +182,14 @@ Vue.component("nav-tag", {
       if (idx !== 0) {
         return false;
       } else {
-        this.isOpenLangs = true;
+        this.isOpenLangs = !this.isOpenLangs;
+      }
+    },
+    closeSelect() {
+      if (this.isOpenLangs === true || this.isLogout === true) {
+        console.log(this.isOpenLangs);
+        this.isOpenLangs = false;
+        this.isLogout = false;
       }
     },
     openMenu() {
@@ -167,7 +200,7 @@ Vue.component("nav-tag", {
       if (idx !== 1) {
         return false;
       } else {
-        this.isLogout = true;
+        this.isLogout = !this.isLogout;
       }
     },
     closeMenu() {
@@ -178,9 +211,28 @@ Vue.component("nav-tag", {
       vm.$emit("close-SM", this.isOpen);
       vm.$emit("change-V", v);
     },
+    changeLang(idx) {
+      let l = this.langs.length;
+      for (let i = 0; i < l; i++) {
+        this.langs[i].active = false;
+      }
+      this.langs[idx].active = true;
+      this.closeSelect();
+    },
   },
   mounted() {
     this.closeMenu();
+  },
+  created() {
+    let self = this;
+    window.addEventListener("click", (e) => {
+      if (!self.$el.contains(e.target)) {
+        this.isOpenLangs = false;
+      }
+      if (!self.$el.contains(e.target)) {
+        this.isLogout = false;
+      }
+    });
   },
 });
 Vue.component("footer-tag", {
@@ -484,7 +536,7 @@ const productsTag = Vue.component("products-tag", {
                   <div class="row2">
                     <table>
                       <tr>
-                        <th v-for="t in thead" width="t.width">{{t.name}}</th>
+                        <th v-for="t in thead">{{t.name}}</th>
                       </tr>
                       <tr class="product">
                         <td>{{products[0]}}</td>
@@ -514,13 +566,13 @@ const productsTag = Vue.component("products-tag", {
       title: "全部商品",
       button: { name: "新增", icon: "fas fa-plus" },
       thead: [
-        { name: "商品名稱", width: "40%" },
-        { name: "圖片", width: "10%" },
-        { name: "商品規格", width: "20%" },
-        { name: "貨存", width: "14%" },
-        { name: "已售數量", width: "14%" },
-        { name: "狀態", width: "14%" },
-        { name: "操作", width: "14%" },
+        { name: "商品名稱" },
+        { name: "圖片" },
+        { name: "商品規格" },
+        { name: "貨存" },
+        { name: "已售數量" },
+        { name: "狀態" },
+        { name: "操作" },
       ],
       products: [
         "模擬商品",
@@ -610,7 +662,7 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
                 <div class="container">
                   <div class="col-12">
                     <div class="button">
-                      <button @click="changeView(t.c_name)" v-for="t in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
+                      <button @click="changeView(t.c_name);changeTab(idx);" :class="{'active': t.active}" v-for="(t,idx) in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
                     </div>
                     <component :is="view"/>
                   </div>
@@ -623,8 +675,18 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
       title: "訂閱計畫",
       view: "pricing",
       tabs: [
-        { c_name: "pricing", name: "訂閱計畫", icon: "fas fa-star" },
-        { c_name: "record", name: "付款記錄", icon: "fas fa-file-alt" },
+        {
+          c_name: "pricing",
+          name: "訂閱計畫",
+          icon: "fas fa-star",
+          active: true,
+        },
+        {
+          c_name: "record",
+          name: "付款記錄",
+          icon: "fas fa-file-alt",
+          active: false,
+        },
       ],
     };
   },
@@ -716,7 +778,7 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
                       <h2>{{tabTitle2}}</h2>
                     </tr>
                     <tr>
-                      <th v-for="t in thead" :width="t.width">{{t.name}}</th>
+                      <th v-for="t in thead">{{t.name}}</th>
                     </tr>
                     <tr>
                       <td colspan="5" class="txt-c">{{result2}}</td>
@@ -729,11 +791,11 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
           result1: "暫無付款方式",
           tabTitle2: "付款記錄",
           thead: [
-            { name: "時間", width: "20%" },
-            { name: "金額", width: "20%" },
-            { name: "付款時間", width: "40%" },
-            { name: "狀態", width: "10%" },
-            { name: "收據", width: "10%" },
+            { name: "時間" },
+            { name: "金額" },
+            { name: "付款時間" },
+            { name: "狀態" },
+            { name: "收據" },
           ],
           result2: "暫無付款方式",
         };
@@ -752,6 +814,13 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
     changeView(v) {
       this.view = v;
     },
+    changeTab(idx) {
+      let l = this.tabs.length;
+      for (let i = 0; i < l; i++) {
+        this.tabs[i].active = false;
+      }
+      this.tabs[idx].active = true;
+    },
   },
   mounted() {
     this.open();
@@ -764,7 +833,7 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
                 <div class="container">
                   <div class="col-12">
                     <div class="button">
-                      <button @click="changeView(t.c_name)" v-for="t in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
+                      <button @click="changeView(t.c_name);changeTab(idx);" :class="{'active': t.active}" v-for="(t,idx) in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
                     </div>
                     <component :is="view"/>
                   </div>
@@ -776,13 +845,29 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
       isOpen: false,
       view: "basic_info",
       tabs: [
-        { c_name: "basic_info", name: "商品設定", icon: "fas fa-cog" },
-        { c_name: "shipping", name: "取貨方式", icon: "fas fa-truck" },
-        { c_name: "payment", name: "支付方式", icon: "fas fa-money-check-alt" },
+        {
+          c_name: "basic_info",
+          name: "商品設定",
+          icon: "fas fa-cog",
+          active: true,
+        },
+        {
+          c_name: "shipping",
+          name: "取貨方式",
+          icon: "fas fa-truck",
+          active: false,
+        },
+        {
+          c_name: "payment",
+          name: "支付方式",
+          icon: "fas fa-money-check-alt",
+          active: false,
+        },
         {
           c_name: "productsettings",
           name: "商品顯示設定",
           icon: "fas fa-cogs",
+          active: false,
         },
       ],
     };
@@ -830,7 +915,7 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
                   <div class="row2">
                     <table>
                       <tr>
-                        <th v-for="t in thead" :width="t.width">{{t.name}}</th>
+                        <th v-for="t in thead">{{t.name}}</th>
                       </tr>
                       <tr class="shipping" v-for="s in shippings">
                         <td>{{s.name}}</td>
@@ -851,10 +936,10 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
           title: "設定商店的取貨方式",
           button: { name: "新增", icon: "fas fa-plus" },
           thead: [
-            { name: "取貨方式", width: "20%" },
-            { name: "取貨指示", width: "20%" },
-            { name: "狀態", width: "20%" },
-            { name: "操作", width: "20%" },
+            { name: "取貨方式" },
+            { name: "取貨指示" },
+            { name: "狀態" },
+            { name: "操作" },
           ],
           shippings: [
             {
@@ -900,7 +985,7 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
                   <div class="row2">
                     <table>
                       <tr>
-                        <th v-for="t in thead" :width="t.width">{{t.name}}</th>
+                        <th v-for="t in thead">{{t.name}}</th>
                       </tr>
                       <tr class="payment" v-for="p in payments">
                         <td>{{p.name}}</td>
@@ -921,10 +1006,10 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
           title: "設定你接受的付款方式",
           button: { name: "新增", icon: "fas fa-plus" },
           thead: [
-            { name: "支付方式", width: "20%" },
-            { name: "支付指示", width: "20%" },
-            { name: "狀態", width: "20%" },
-            { name: "操作", width: "20%" },
+            { name: "支付方式" },
+            { name: "支付指示" },
+            { name: "狀態" },
+            { name: "操作" },
           ],
           payments: [
             {
@@ -1027,6 +1112,13 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
     changeView(v) {
       this.view = v;
     },
+    changeTab(idx) {
+      let l = this.tabs.length;
+      for (let i = 0; i < l; i++) {
+        this.tabs[i].active = false;
+      }
+      this.tabs[idx].active = true;
+    },
   },
   mounted() {
     this.open();
@@ -1039,7 +1131,7 @@ const teammateTag = Vue.component("teammate-tag", {
                 <div class="container">
                   <div class="col-12">
                     <div class="button">
-                      <button @click="changeView(t.c_name)" v-for="t in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
+                      <button @click="changeView(t.c_name);changeTab(idx);" :class="{'active': t.active}" v-for="(t,idx) in tabs" :key="t.name"><i :class="t.icon"></i>{{t.name}}</button>
                     </div>
                     <component :is="view"/>
                   </div>
@@ -1052,8 +1144,18 @@ const teammateTag = Vue.component("teammate-tag", {
       title: "人員管理",
       view: "admin",
       tabs: [
-        { c_name: "admin", name: "管理者", icon: "fas fa-user-friends" },
-        { c_name: "helper", name: "工作人員", icon: "fas fa-user" },
+        {
+          c_name: "admin",
+          name: "管理者",
+          icon: "fas fa-user-friends",
+          active: true,
+        },
+        {
+          c_name: "helper",
+          name: "工作人員",
+          icon: "fas fa-user",
+          active: false,
+        },
       ],
     };
   },
@@ -1122,7 +1224,7 @@ const teammateTag = Vue.component("teammate-tag", {
                   <div class="row2">
                     <table>
                       <tr>
-                        <th v-for="t in thead" :width="t.width">{{t.name}}</th>
+                        <th v-for="t in thead">{{t.name}}</th>
                       </tr>
                       <tr>
                         <td colspan="6" class="txt-c">{{result}}</td>
@@ -1137,11 +1239,7 @@ const teammateTag = Vue.component("teammate-tag", {
         return {
           title: "工作人員",
           button: { name: "新增", icon: "fas fa-plus" },
-          thead: [
-            { name: "帳號", width: "70%" },
-            { name: "狀態", width: "15%" },
-            { name: "操作", width: "15%" },
-          ],
+          thead: [{ name: "帳號" }, { name: "狀態" }, { name: "操作" }],
           result: "No data available",
           pages: [10, 20, 50, 100],
           icons: ["fas fa-arrow-left", "fas fa-arrow-right"],
@@ -1160,6 +1258,13 @@ const teammateTag = Vue.component("teammate-tag", {
     },
     changeView(v) {
       this.view = v;
+    },
+    changeTab(idx) {
+      let l = this.tabs.length;
+      for (let i = 0; i < l; i++) {
+        this.tabs[i].active = false;
+      }
+      this.tabs[idx].active = true;
     },
   },
   mounted() {
