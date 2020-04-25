@@ -101,21 +101,23 @@ Vue.component("side-menu-tag", {
   },
 });
 Vue.component("nav-tag", {
-  template: `<div class="wrapper" id="nav">
-                <div class="left-nav" :class="{'active':isOpenSideMenu}">
-                    <a href="javascript:;" @click="openMenu"><i :class="leftIcons"></i></a>
-                </div>
-                <div class="right-nav">
-                    <a href="javascript:;" @click=changeView(i.c_name) v-for="(i,idx) in rightIcons1" :key="idx" @blur="isOpenLangs=false;isLogout=false">
-                      <i :class="i.icon"></i>
-                      <span>{{i.name}}</span>
-                    </a>
-                    <a href="javascript:;" v-for="(i,idx) in rightIcons2" @click="openLang(idx),openLogout(idx)" @blur="isOpenLangs=false;isLogout=false"><i :class="i.icon"></i><span>{{i.name}}</span></a>
-                    <div class="lang" :class="{'active': isOpenLangs}">
-                        <p v-for="l in langs"><span>{{l.abbrr}}</span>{{l.name}}</p>
-                    </div>
-                    <div class="logout" :class="{'active': isLogout}" >
-                        <p>{{logout}}</p>
+  template: `<div id="nav">
+                <div class="wrapper">
+                  <div class="left-nav" :class="{'active':isOpenSideMenu}">
+                      <a href="javascript:;" @click="openMenu"><i :class="leftIcons"></i></a>
+                  </div>
+                  <div class="right-nav">
+                      <a href="javascript:;" @click=changeView(i.c_name) v-for="(i,idx) in rightIcons1" :key="idx" @blur="isOpenLangs=false;isLogout=false">
+                        <i :class="i.icon"></i>
+                        <span>{{i.name}}</span>
+                      </a>
+                      <a href="javascript:;" v-for="(i,idx) in rightIcons2" @click="openLang(idx),openLogout(idx)" @blur="isOpenLangs=false;isLogout=false"><i :class="i.icon"></i><span>{{i.name}}</span></a>
+                      <div class="lang" :class="{'active': isOpenLangs}">
+                          <p v-for="l in langs"><span>{{l.abbrr}}</span>{{l.name}}</p>
+                      </div>
+                      <div class="logout" :class="{'active': isLogout}" >
+                          <p>{{logout}}</p>
+                      </div>
                     </div>
                 </div>
             </div>`,
@@ -183,8 +185,12 @@ Vue.component("nav-tag", {
 });
 Vue.component("footer-tag", {
   template: `<div id="footer" :class="{'active':isOpen}">
-            <p>JCart <i class="far fa-copyright"></i> {{date}}</p>
-          </div>`,
+              <div class="wrapper">
+                <div class="col-12">
+                  <p>JCart <i class="far fa-copyright"></i> {{date}}</p>
+                </div>
+              </div>
+            </div>`,
   data() {
     return {
       isOpen: false,
@@ -415,7 +421,7 @@ const ordersTag = Vue.component("orders-tag", {
                     </div>
                     <button><i :class="filter.icon"></i>{{filter.name}}</button>
                   </div>
-                  <div class="col-12 row2">
+                  <div class="row2">
                     <table>
                       <tr>
                         <th v-for="t in thead">{{t}}</th>
@@ -475,10 +481,10 @@ const productsTag = Vue.component("products-tag", {
                     <h1>{{title}}</h1>
                     <button><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
-                  <div class="col-12 row2">
+                  <div class="row2">
                     <table>
                       <tr>
-                        <th v-for="t in thead" :width="t.width">{{t.name}}</th>
+                        <th v-for="t in thead" width="t.width">{{t.name}}</th>
                       </tr>
                       <tr class="product">
                         <td>{{products[0]}}</td>
@@ -508,13 +514,13 @@ const productsTag = Vue.component("products-tag", {
       title: "全部商品",
       button: { name: "新增", icon: "fas fa-plus" },
       thead: [
-        { name: "商品名稱", width: "25%" },
+        { name: "商品名稱", width: "40%" },
         { name: "圖片", width: "10%" },
         { name: "商品規格", width: "20%" },
-        { name: "貨存", width: "10%" },
-        { name: "已售數量", width: "10%" },
-        { name: "狀態", width: "10%" },
-        { name: "操作", width: "15%" },
+        { name: "貨存", width: "14%" },
+        { name: "已售數量", width: "14%" },
+        { name: "狀態", width: "14%" },
+        { name: "操作", width: "14%" },
       ],
       products: [
         "模擬商品",
@@ -556,7 +562,7 @@ const promoCodeTag = Vue.component("promo-code-tag", {
                     <h1>{{title}}</h1>
                     <button><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
-                  <div class="col-12 row2">
+                  <div class="row2">
                     <table>
                       <tr>
                         <th v-for="t in thead">{{t}}</th>
@@ -626,7 +632,7 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
     pricing: {
       template: `<div id="pricing">
                   <h1>{{title}}</h1>
-                  <div class="col-3 col-lg-3">
+                  <div class="col-12 col-lg-3 free">
                     <div class="card-title">
                       <h3>{{free_t}}</h3>
                       <span>{{free_a}}</span>
@@ -642,7 +648,7 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
                       <p>{{free_content[1]}}<span class="heightlight">{{free_maxnum_h}}</span>{{free_content[2]}}</p>
                     </div>
                   </div>
-                  <div class="col-8 col-lg-8">
+                  <div class="col-12 col-lg-8 pro">
                     <div class="card-title">
                       <h3>{{pro_t}}</h3>
                       <span>{{pro_a}}</span>
@@ -818,10 +824,10 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
     shipping: {
       template: `<div id="shipping" class="clearfix">
                   <div class="col-12 row1">
-                    <h1>{{title}}</h1>
+                    <h3>{{title}}</h3>
                     <button><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
-                  <div class="col-12 row2">
+                  <div class="row2">
                     <table>
                       <tr>
                         <th v-for="t in thead" :width="t.width">{{t.name}}</th>
@@ -888,10 +894,10 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
     payment: {
       template: `<div id="payment" class="clearfix">
                   <div class="col-12 row1">
-                    <h1>{{title}}</h1>
+                    <h3>{{title}}</h3>
                     <button><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
-                  <div class="col-12 row2">
+                  <div class="row2">
                     <table>
                       <tr>
                         <th v-for="t in thead" :width="t.width">{{t.name}}</th>
@@ -948,7 +954,7 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
     productsettings: {
       template: `<div id="productsettings" class="clearfix">
                   <div class="col-12">
-                    <h3>{{title}}</h3>
+                    <h4>{{title}}</h4>
                   </div>
                   <div class="col-12 setting" v-for="s in settings" :class="[s.classname,{'active':s.isOpen}]" @click="s.isOpen = !s.isOpen">
                     <div class="card-title">
@@ -1058,7 +1064,7 @@ const teammateTag = Vue.component("teammate-tag", {
                     <h1>{{title}}</h1>
                     <button><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
-                  <div class="col-12 row2">
+                  <div class="row2">
                     <table>
                       <tr>
                         <th v-for="t in thead">{{t}}</th>
@@ -1113,7 +1119,7 @@ const teammateTag = Vue.component("teammate-tag", {
                     <h1>{{title}}</h1>
                     <button><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
-                  <div class="col-12 row2">
+                  <div class="row2">
                     <table>
                       <tr>
                         <th v-for="t in thead" :width="t.width">{{t.name}}</th>
