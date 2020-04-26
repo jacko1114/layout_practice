@@ -11,12 +11,19 @@
 
 <body>
     <div id="app">
-        <div>
+        <div v-if="abbrr === 'Zh'">
             <side-menu-tag></side-menu-tag>
             <nav-tag @changeV="changeView()">
             </nav-tag>
             <component :is="view"></component>
             <footer-tag></footer-tag>
+        </div>
+        <div v-else>
+            <side-menu-en-tag></side-menu-en-tag>
+            <nav-en-tag @changeV="changeView()">
+            </nav-en-tag>
+            <component :is="view"></component>
+            <footer-en-tag></footer-en-tag>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js"></script>
