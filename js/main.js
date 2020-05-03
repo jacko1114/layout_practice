@@ -237,7 +237,7 @@ Vue.component("nav-tag", {
 });
 Vue.component("footer-tag", {
   template: `<div id="footer" :class="{'active':isOpen}">
-              <div class="wrapper">
+              <div class="wrapper clearfix">
                 <div class="col-12">
                   <p>JCart <i class="far fa-copyright"></i> {{date}}</p>
                 </div>
@@ -440,7 +440,7 @@ const notificationsTag = Vue.component("notifications-tag", {
     return {
       isOpen: false,
       title: "通知設定",
-      content: "通知將經由你的JCart發出。",
+      content: "通知將經由你的 JCart 發出。",
       button: "開啟通知",
     };
   },
@@ -460,7 +460,7 @@ const notificationsTag = Vue.component("notifications-tag", {
   },
 });
 const ordersTag = Vue.component("orders-tag", {
-  template: `<div id="orders" :class="{'active':isOpen}">
+  template: `<div id="orders" :class="{'active':isOpen}"  @click.self="filterPop.isOpen = false">
               <div class="wrapper">
                 <div class="container">
                   <div class="col-12">
@@ -471,7 +471,15 @@ const ordersTag = Vue.component("orders-tag", {
                       <i :class="searchIcons"/>
                       <input type="text" :placeholder="placeholder">
                     </div>
-                    <button><i :class="filter.icon"></i>{{filter.name}}</button>
+                    <button @click="filterPop.isOpen = !filterPop.isOpen">
+                      <i :class="filter.icon"></i>{{filter.name}}
+                    </button>
+                    <div class="filterPop" :class="{'active':filterPop.isOpen}">
+                      <h3>{{filterPop.title}}</h3>
+                      <label>{{filterPop.label}}</label>
+                      <select><option v-for="s in filterPop.selects">{{s}}</option></select>
+                      <button @click.self="filterPop.isOpen = false">{{filterPop.button}}</button>
+                    </div>
                   </div>
                   <div class="row2">
                     <table>
@@ -496,6 +504,20 @@ const ordersTag = Vue.component("orders-tag", {
       searchIcons: "fas fa-search",
       placeholder: "訂單編號 / 顧客名稱 / 連絡電話",
       filter: { name: "篩選", icon: "fas fa-filter" },
+      filterPop: {
+        isOpen: false,
+        title: "按訂單狀態篩選",
+        label: "選擇訂單狀態",
+        selects: [
+          "等待付款中",
+          "等待收款確認",
+          "已付款",
+          "全部寄出",
+          "部分出貨",
+          "全部取貨",
+        ],
+        button: "確認",
+      },
       thead: [
         "訂單編號",
         "顧客名稱",
@@ -531,7 +553,7 @@ const productsTag = Vue.component("products-tag", {
                 <div class="container">
                   <div class="col-12 row1">
                     <h1>{{title}}</h1>
-                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                    <button @click="addPop.isOpen = true"><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
                   <div class="row2">
                     <table>
@@ -540,15 +562,19 @@ const productsTag = Vue.component("products-tag", {
                       </tr>
                       <tr class="product">
                         <td>{{products[0]}}</td>
-                        <td>{{products[1]}}</td>
+                        <td><img :src="products[1]" class="image"></td>
                         <td><p v-for="p in products[2]">{{p}}</p></td>
                         <td>{{products[3]}}</td>
                         <td>{{products[4]}}</td>
                         <td><select><option v-for="p in products[5]">{{p}}</option></select></td>
                         <td>
-                          <a href="javascript:;" v-for="p in products[6]">
-                            <i :class="p.icon"/>
-                            <span>{{p.action}}</span>
+                          <a href="javascript:;"  @click="editPop.isOpen = true">
+                            <i :class="products[6][0].icon"/>
+                            <span>{{products[6][0].action}}</span>
+                          </a>
+                          <a href="javascript:;" @click="delPop.isOpen = true">
+                            <i :class="products[6][1].icon"/>
+                            <span>{{products[6][1].action}}</span>
                           </a>
                         </td>
                       </tr>
@@ -558,6 +584,86 @@ const productsTag = Vue.component("products-tag", {
                     </table>
                   </div>
                 </div>
+                <div class="popup-background add" :class="{'active':addPop.isOpen}" @click.self="addPop.isOpen = false">
+                  <div class="popup">
+                    <div class="col-12 modal-head">
+                      <h2>{{addPop.title}}</h2>
+                      <select><option v-for="p in products[5]">{{p}}</option></select>
+                    </div>
+                    <div class="col-12 modal-body">
+                      <h4>{{addPop.items[0]}}</h4>
+                      <input type="text">
+                    </div>
+                    <div class="col-12 modal-body">
+                      <h4>{{addPop.items[1]}}</h4>
+                      <input type="file">
+                    </div>
+                    <div class="col-12 modal-body">
+                      <h4>{{addPop.items[2]}}</h4>
+                      <table>
+                        <tr>
+                          <th v-for="t in addPop.tableHead">{{t}}</th>
+                        </tr>
+                        <tr v-for="v in addPop.variants">
+                          <td><input type="text" v-model="v.name" class="variants"></td>
+                          <td><input type="number" v-model="v.price" class="variants"></td>
+                          <td class="amount"><input type="number" v-model="v.remain" class="remain"><span>/</span><input type="number" v-model="v.total"></td>
+                        </tr>
+                      </table>
+                    </div>
+                    <div class="col-12 modal-footer">
+                      <a href="javascript:;" :class="addPop.buttons[0].class" @click="addPop.isOpen = false">{{addPop.buttons[0].name}}</a>
+                      <a href="javascript:;" :class="addPop.buttons[1].class">{{addPop.buttons[1].name}}</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="popup-background edit" :class="{'active':editPop.isOpen}" @click.self="editPop.isOpen = false">
+                  <div class="popup">
+                    <div class="col-12 modal-head">
+                      <h2>{{editPop.title}}</h2>
+                      <select><option v-for="p in products[5]">{{p}}</option></select>
+                    </div>
+                    <div class="col-12 modal-body">
+                      <h4>{{editPop.items[0]}}</h4>
+                      <input type="text" v-model="products[0]">
+                    </div>
+                    <div class="col-12 modal-body">
+                      <h4>{{editPop.items[1]}}</h4>
+                      <img :src="editPop.imgpath">
+                    </div>
+                    <div class="col-12 modal-body">
+                      <h4>{{editPop.items[2]}}</h4>
+                      <table>
+                        <tr>
+                          <th v-for="t in editPop.tableHead">{{t}}</th>
+                        </tr>
+                        <tr v-for="v in editPop.variants">
+                          <td><input type="text" v-model="v.name" class="variants"></td>
+                          <td><input type="number" v-model="v.price" class="variants"></td>
+                          <td class="amount"><input type="number" v-model="v.remain" class="remain"><span>/</span><input type="number" v-model="v.total"></td>
+                        </tr>
+                      </table>
+                    </div>
+                    <div class="col-12 modal-footer">
+                      <a href="javascript:;" :class="editPop.buttons[0].class" @click="editPop.isOpen = false">{{editPop.buttons[0].name}}</a>
+                      <a href="javascript:;" :class="editPop.buttons[1].class">{{editPop.buttons[1].name}}</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="popup-background del" :class="{'active':delPop.isOpen}" @click.self="delPop.isOpen = false">
+                  <div class="popup">
+                    <div class="col-12 modal-head">
+                      <i :class="delPop.icon"/>
+                    </div>
+                    <div class="col-12 modal-body">
+                      <p>你確定刪除"{{products[0]}}"?</p>
+                    </div>
+                    <div class="col-12 modal-footer">
+                      <a href="javascript:;" :class="delPop.buttons[0].class" @click="delPop.isOpen = false">{{delPop.buttons[0].name}}</a>
+                      <a href="javascript:;" :class="delPop.buttons[1].class">{{delPop.buttons[1].name}}</a>
+                    </div>
+                  </div>
+                </div>   
               </div>
             </div>`,
   data() {
@@ -567,7 +673,7 @@ const productsTag = Vue.component("products-tag", {
       button: { name: "新增", icon: "fas fa-plus" },
       thead: [
         { name: "商品名稱" },
-        { name: "圖片" },
+        { name: "商品圖片" },
         { name: "商品規格" },
         { name: "貨存" },
         { name: "已售數量" },
@@ -576,10 +682,10 @@ const productsTag = Vue.component("products-tag", {
       ],
       products: [
         "模擬商品",
-        "圖片",
+        "./images/cart.jpg",
         ["紅R $100[10]", "藍B $100[10]", "黃Y $100[10]"],
-        "30",
-        "0",
+        30,
+        0,
         ["上架中", "已下架"],
         [
           { action: "編輯", icon: "fas fa-pen" },
@@ -589,6 +695,41 @@ const productsTag = Vue.component("products-tag", {
       rows: [10, 20, 30, 40],
       pages: [1],
       icons: ["fas fa-arrow-left", "fas fa-arrow-right"],
+      addPop: {
+        isOpen: false,
+        title: "新增商品",
+        items: ["商品名稱", "商品圖片", "商品規格"],
+        tableHead: ["規格(尺寸、顏色...)", "價錢", "剩餘數量/總數"],
+        variants: [{ name: "", price: 0, remain: 0, total: 0 }],
+        buttons: [
+          { name: "返回", class: "cancel" },
+          { name: "建立", class: "create" },
+        ],
+      },
+      editPop: {
+        isOpen: false,
+        title: "更新商品",
+        imgpath: "./images/cart.jpg",
+        items: ["商品名稱", "商品圖片", "商品規格"],
+        tableHead: ["規格(尺寸、顏色...)", "價錢", "剩餘數量/總數"],
+        variants: [
+          { name: "紅R", price: 100, remain: 10, total: 10 },
+          { name: "藍B", price: 100, remain: 10, total: 10 },
+          { name: "黃Y", price: 100, remain: 10, total: 10 },
+        ],
+        buttons: [
+          { name: "返回", class: "cancel" },
+          { name: "更新", class: "update" },
+        ],
+      },
+      delPop: {
+        isOpen: false,
+        icon: "fas fa-exclamation",
+        buttons: [
+          { name: "取消", class: "cancel" },
+          { name: "刪除", class: "delete" },
+        ],
+      },
     };
   },
   methods: {
@@ -612,7 +753,7 @@ const promoCodeTag = Vue.component("promo-code-tag", {
                 <div class="container">
                   <div class="col-12 row1">
                     <h1>{{title}}</h1>
-                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                    <button @click="promoCodeAddPop.isOpen = true"><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
                   <div class="row2">
                     <table>
@@ -628,6 +769,58 @@ const promoCodeTag = Vue.component("promo-code-tag", {
                     </table>
                   </div>
                 </div>
+                <div class="popup-background promo-code-add" :class="{'active':promoCodeAddPop.isOpen}" @click.self="promoCodeAddPop.isOpen = false">
+                  <div class="popup">
+                    <div class="col-12 modal-head">
+                      <h2>{{promoCodeAddPop.title}}</h2>
+                      <button @click="promoCodeAddPop.isOpen = false"><i :class="promoCodeAddPop.icon"></i></button>
+                    </div>
+                    <div class="col-12 modal-body">
+                      <div class="col-12 col-md-6">
+                        <h4>{{promoCodeAddPop.items[0]}}</h4>
+                        <label>{{promoCodeAddPop.subitems[0]}}</label>
+                        <input type="text">
+                      </div>
+                      <div class="col-12 col-md-6 times">
+                        <label>{{promoCodeAddPop.subitems[1]}}</label>
+                        <input type="number">
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <h4>{{promoCodeAddPop.items[1]}}</h4>
+                        <input type="radio" checked="true">
+                        <label>{{promoCodeAddPop.date}}</label>
+                      </div>
+                      <div class="col-12 col-md-3" v-for="v in promoCodeAddPop.validDate">
+                        <label>{{v}}</label>
+                        <input type="date">
+                      </div>
+                      <div class="col-6">
+                        <input type="radio" name="discount" :value="promoCodeAddPop.discount[0]" v-model="promoCodeAddPop.picked">
+                        <label>{{promoCodeAddPop.discount[0]}}</label>
+                        <input type="radio" name="discount" :value="promoCodeAddPop.discount[1]" v-model="promoCodeAddPop.picked">
+                        <label>{{promoCodeAddPop.discount[1]}}</label>
+                      </div>
+                      <div class="col-12 col-md-6" v-if="promoCodeAddPop.picked === '按金額折扣'">
+                        <label>{{promoCodeAddPop.subdiscount[0]}}</label>
+                        <span class="dollar">$</span><input type="number" class="money">
+                      </div>
+                      <div class="col-12 col-md-6" v-else>
+                        <label>{{promoCodeAddPop.subdiscount[1]}}</label>
+                        <input type="number"><span class="percent">%</span>
+                      </div>
+                      <div class="col-12">
+                        <h4>{{promoCodeAddPop.items[2]}}</h4>
+                        <select>
+                          <option v-for="l in promoCodeAddPop.limits" :value="l">{{l}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-12 modal-footer">
+                      <a href="javascript:;" :class="promoCodeAddPop.buttons[0].class" @click="promoCodeAddPop.isOpen = false">{{promoCodeAddPop.buttons[0].name}}</a>
+                      <a href="javascript:;" :class="promoCodeAddPop.buttons[1].class">{{promoCodeAddPop.buttons[1].name}}</a>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>`,
   data() {
@@ -639,6 +832,28 @@ const promoCodeTag = Vue.component("promo-code-tag", {
       result: "無符合資料",
       pages: [10, 20, 50, 100],
       icons: ["fas fa-arrow-left", "fas fa-arrow-right"],
+      promoCodeAddPop: {
+        isOpen: false,
+        title: "優惠碼設定",
+        icon: "fas fa-times",
+        items: ["新增優惠碼", "有效時間", "優惠折扣", "使用限制"],
+        subitems: ["優惠碼名稱", "可使用次數"],
+        date: "指定範圍",
+        validDate: ["生效日期", "到期日期"],
+        discount: ["按金額折扣", "優惠折扣"],
+        subdiscount: ["折扣金額", "折扣優惠"],
+        picked: "按金額折扣",
+        limits: [
+          "不設限制",
+          "指定商品使用",
+          "特價商品不可使用",
+          "最低消費滿指定金額才可使用",
+        ],
+        buttons: [
+          { name: "返回", class: "cancel" },
+          { name: "新增", class: "create" },
+        ],
+      },
     };
   },
   methods: {
@@ -728,9 +943,23 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
                       </div>
                     </div>
                     <div class="card-footer2 clearfix">
-                      <button class="levelup">{{button}}</button>
+                      <button class="levelup" @click="planUpdatePop.isOpen = true">{{button}}</button>
                     </div>
                   </div>
+                  <div class="popup-background plan-update" :class="{'active':planUpdatePop.isOpen}" @click.self="planUpdatePop.isOpen = false">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <i :class="planUpdatePop.icon"/>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <p>{{planUpdatePop.content}}</p>
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="planUpdatePop.buttons[0].class" @click="planUpdatePop.isOpen = false">{{planUpdatePop.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="planUpdatePop.buttons[1].class">{{planUpdatePop.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div> 
                 </div>`,
       data() {
         return {
@@ -738,7 +967,7 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
           free_t: "免費版",
           free_a: "現正使用",
           free_st: "簡易開店助你打開網上銷售",
-          free_c: "USD",
+          free_c: "NTD",
           free_m: "0",
           free_d: "/月",
           free_content: ["活躍用戶上限: ", "今期餘下", "位活躍用戶數"],
@@ -747,8 +976,8 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
           pro_t: "專家版",
           pro_a: null,
           pro_st: "完整功能輕鬆上手，經營網店入門首選",
-          pro_c: "USD",
-          pro_m: "5",
+          pro_c: "NTD",
+          pro_m: "200",
           pro_d: "/月",
           pro_content: "基本包括所有免費版功能及以下進階功能",
           pro_features: [
@@ -760,6 +989,16 @@ const subscriptionPlanTag = Vue.component("subscription-plan-tag", {
             { icon: "fas fa-check", content: "購物滿額送贈功能" },
           ],
           button: "升級計畫",
+          planUpdatePop: {
+            isOpen: false,
+            icon: "fas fa-exclamation",
+            content:
+              "你將導向至信用卡付款平台，你需填寫信用卡資料授權每月訂閱收費，月費將於每月結尾按當前活躍人數從你的信用卡自動收取。",
+            buttons: [
+              { name: "返回", class: "cancel" },
+              { name: "繼續", class: "continue" },
+            ],
+          },
         };
       },
     },
@@ -910,25 +1149,92 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
       template: `<div id="shipping" class="clearfix">
                   <div class="col-12 row1">
                     <h3>{{title}}</h3>
-                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                    <button @click="addPop.isOpen = true"><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
                   <div class="row2">
                     <table>
                       <tr>
                         <th v-for="t in thead">{{t.name}}</th>
                       </tr>
-                      <tr class="shipping" v-for="s in shippings">
+                      <tr class="shipping" v-for="(s,idx) in shippings">
                         <td>{{s.name}}</td>
                         <td>{{s.claim}}</td>
-                        <td>{{s.status}}</td>
+                        <td >
+                          <span :class="s.statusO.class" v-if="s.status">{{s.statusO.name}}</span>
+                          <span :class="s.statusC.class" v-else>{{s.statusC.name}}</span>
+                        </td>
                         <td>
-                          <a href="javascript:;" v-for="sa in s.actions">
-                            <i :class="sa.icon"/>
-                            <span>{{sa.action}}</span>
+                          <a href="javascript:;">
+                            <i :class="s.actions[0].icon" @click="editPop[idx].isOpen = true"/>
+                            <span>{{s.actions[0].action}}</span>
+                          </a>
+                          <a href="javascript:;">
+                            <i :class="s.actions[1].icon" @click="shippings[idx].status = !shippings[idx].status"/>
+                            <span>{{s.actions[1].action}}</span>
+                          </a>
+                          <a href="javascript:;">
+                            <i :class="s.actions[2].icon" @click="delPop[idx].isOpen = true" />
+                            <span>{{s.actions[2].action}}</span>
                           </a>
                         </td>
                       </tr>
                     </table>
+                  </div>
+                  <div class="popup-background del" :class="{'active':d.isOpen}" @click.self="d.isOpen = false" v-for="d in delPop">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <i :class="d.icon"/>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <p>你確定刪除"{{d.name}}"?</p>
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="d.buttons[0].class" @click="d.isOpen = false">{{d.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="d.buttons[1].class">{{d.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="popup-background shipping-edit" :class="{'active':e.isOpen}" @click.self="e.isOpen = false" v-for="e in editPop">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <h2>{{e.title}}</h2>
+                        <button @click="e.isOpen = false"><i :class="e.icon"/></button>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{e.label[0]}}</h4>
+                        <input type="text" v-model="e.content[0]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{e.label[1]}}</h4>
+                        <input type="text" v-model="e.content[1]">
+                        <p>{{e.noti}}</p>
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="e.buttons[0].class" @click="e.isOpen = false">{{e.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="e.buttons[1].class">{{e.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="popup-background shipping-add" :class="{'active':addPop.isOpen}" @click.self="addPop.isOpen = false">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <h2>{{addPop.title}}</h2>
+                        <button @click="addPop.isOpen = false"><i :class="addPop.icon"/></button>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[0]}}</h4>
+                        <input type="text" v-model="addPop.content[0]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[1]}}</h4>
+                        <input type="text" v-model="addPop.content[1]">
+                        <p>{{addPop.noti}}</p>
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="addPop.buttons[0].class" @click="addPop.isOpen = false">{{addPop.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="addPop.buttons[1].class">{{addPop.buttons[1].name}}</a>
+                      </div>
+                    </div>
                   </div>
                 </div>`,
       data() {
@@ -945,7 +1251,9 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
             {
               name: "快快快遞(假)",
               claim: "購買滿$300包郵，$300以下運貨到付",
-              status: "開啟中",
+              statusO: { name: "開啟中", class: "open" },
+              statusC: { name: "已停用", class: "close" },
+              status: false,
               actions: [
                 { icon: "fas fa-edit", action: "編輯" },
                 { icon: "fas fa-ban", action: "啟用/停用" },
@@ -955,7 +1263,9 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
             {
               name: "快慢快遞(假)",
               claim: "購買滿$600包郵，$600以下運貨到付",
-              status: "開啟中",
+              statusO: { name: "開啟中", class: "open" },
+              statusC: { name: "已停用", class: "close" },
+              status: false,
               actions: [
                 { icon: "fas fa-edit", action: "編輯" },
                 { icon: "fas fa-ban", action: "啟用/停用" },
@@ -965,7 +1275,9 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
             {
               name: "慢慢快遞(假)",
               claim: "購買滿$1000包郵，$1000以下運貨到付",
-              status: "開啟中",
+              statusO: { name: "開啟中", class: "open" },
+              statusC: { name: "已停用", class: "close" },
+              status: false,
               actions: [
                 { icon: "fas fa-edit", action: "編輯" },
                 { icon: "fas fa-ban", action: "啟用/停用" },
@@ -973,6 +1285,85 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
               ],
             },
           ],
+          delPop: [
+            {
+              isOpen: false,
+              name: "快快快遞(假)",
+              icon: "fas fa-exclamation",
+              buttons: [
+                { name: "取消", class: "cancel" },
+                { name: "刪除", class: "delete" },
+              ],
+            },
+            {
+              isOpen: false,
+              name: "快慢快遞(假)",
+              icon: "fas fa-exclamation",
+              buttons: [
+                { name: "取消", class: "cancel" },
+                { name: "刪除", class: "delete" },
+              ],
+            },
+            {
+              isOpen: false,
+              name: "慢慢快遞(假)",
+              icon: "fas fa-exclamation",
+              buttons: [
+                { name: "取消", class: "cancel" },
+                { name: "刪除", class: "delete" },
+              ],
+            },
+          ],
+          editPop: [
+            {
+              isOpen: false,
+              title: "修改取貨方式",
+              icon: "fas fa-times",
+              label: ["顯示名稱", "取貨指示"],
+              content: ["快快快遞(假)", "購買滿$300包郵，$300以下運貨到付"],
+              noti: "指示會顯示於結帳頁面!",
+              buttons: [
+                { name: "取消", class: "cancel" },
+                { name: "更新", class: "update" },
+              ],
+            },
+            {
+              isOpen: false,
+              title: "修改取貨方式",
+              icon: "fas fa-times",
+              label: ["顯示名稱", "取貨指示"],
+              content: ["快慢快遞(假)", "購買滿$600包郵，$600以下運貨到付"],
+              noti: "指示會顯示於結帳頁面!",
+              buttons: [
+                { name: "取消", class: "cancel" },
+                { name: "更新", class: "update" },
+              ],
+            },
+            {
+              isOpen: false,
+              title: "修改取貨方式",
+              icon: "fas fa-times",
+              label: ["顯示名稱", "取貨指示"],
+              content: ["慢慢快遞(假)", "購買滿$1000包郵，$1000以下運貨到付"],
+              noti: "指示會顯示於結帳頁面!",
+              buttons: [
+                { name: "取消", class: "cancel" },
+                { name: "更新", class: "update" },
+              ],
+            },
+          ],
+          addPop: {
+            isOpen: false,
+            title: "新增取貨方式",
+            icon: "fas fa-times",
+            label: ["顯示名稱", "取貨指示"],
+            content: ["", ""],
+            noti: "指示會顯示於結帳頁面!",
+            buttons: [
+              { name: "取消", class: "cancel" },
+              { name: "新增", class: "create" },
+            ],
+          },
         };
       },
     },
@@ -1052,7 +1443,7 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
                             <span>{{s.actionname}}</span>
                       </a>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" v-if="s.isOpen === true">
                       <label class="checkbox">
                         <input type="checkbox">
                         <span class="knob"/>
