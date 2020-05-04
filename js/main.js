@@ -515,6 +515,7 @@ const ordersTag = Vue.component("orders-tag", {
           "全部寄出",
           "部分出貨",
           "全部取貨",
+          "取消訂單",
         ],
         button: "確認",
       },
@@ -795,10 +796,10 @@ const promoCodeTag = Vue.component("promo-code-tag", {
                         <input type="date">
                       </div>
                       <div class="col-6">
-                        <input type="radio" name="discount" :value="promoCodeAddPop.discount[0]" v-model="promoCodeAddPop.picked">
-                        <label>{{promoCodeAddPop.discount[0]}}</label>
-                        <input type="radio" name="discount" :value="promoCodeAddPop.discount[1]" v-model="promoCodeAddPop.picked">
-                        <label>{{promoCodeAddPop.discount[1]}}</label>
+                        <input type="radio" name="discount" :value="promoCodeAddPop.discount[0]" v-model="promoCodeAddPop.picked" :id="promoCodeAddPop.discount[0]">
+                        <label :for="promoCodeAddPop.discount[0]">{{promoCodeAddPop.discount[0]}}</label>
+                        <input type="radio" name="discount" :value="promoCodeAddPop.discount[1]" v-model="promoCodeAddPop.picked" :id="promoCodeAddPop.discount[1]">
+                        <label :for="promoCodeAddPop.discount[1]">{{promoCodeAddPop.discount[1]}}</label>
                       </div>
                       <div class="col-12 col-md-6" v-if="promoCodeAddPop.picked === '按金額折扣'">
                         <label>{{promoCodeAddPop.subdiscount[0]}}</label>
@@ -1371,25 +1372,102 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
       template: `<div id="payment" class="clearfix">
                   <div class="col-12 row1">
                     <h3>{{title}}</h3>
-                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                    <button @click="addPop.isOpen = true"><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
                   <div class="row2">
                     <table>
                       <tr>
                         <th v-for="t in thead">{{t.name}}</th>
                       </tr>
-                      <tr class="payment" v-for="p in payments">
+                      <tr class="payment" v-for="(p,idx) in payments">
                         <td>{{p.name}}</td>
                         <td>{{p.claim}}</td>
-                        <td>{{p.status}}</td>
                         <td>
-                          <a href="javascript:;" v-for="pa in p.actions">
-                            <i :class="pa.icon"/>
-                            <span>{{pa.action}}</span>
+                          <span :class="p.statusO.class" v-if="p.status">{{p.statusO.name}}</span>
+                          <span :class="p.statusC.class" v-else>{{p.statusC.name}}</span>
+                        </td>
+                        <td>
+                          <a href="javascript:;">
+                            <i :class="p.actions[0].icon" @click="editPop[idx].isOpen = true"/>
+                            <span>{{p.actions[0].action}}</span>
+                          </a>
+                          <a href="javascript:;">
+                            <i :class="p.actions[1].icon" @click="payments[idx].status = !payments[idx].status"/>
+                            <span>{{p.actions[1].action}}</span>
+                          </a>
+                          <a href="javascript:;">
+                            <i :class="p.actions[2].icon" @click="delPop[idx].isOpen = true" />
+                            <span>{{p.actions[2].action}}</span>
                           </a>
                         </td>
                       </tr>
                     </table>
+                  </div>
+                  <div class="popup-background del" :class="{'active':d.isOpen}" @click.self="d.isOpen = false" v-for="d in delPop">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <i :class="d.icon"/>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <p>你確定刪除"{{d.name}}"?</p>
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="d.buttons[0].class" @click="d.isOpen = false">{{d.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="d.buttons[1].class">{{d.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="popup-background payment-edit" :class="{'active':e.isOpen}" @click.self="e.isOpen = false" v-for="e in editPop">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <h2>{{e.title}}</h2>
+                        <button @click="e.isOpen = false"><i :class="e.icon"/></button>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{e.label[0]}}</h4>
+                        <input type="text" v-model="e.content[0]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{e.label[1]}}</h4>
+                        <input type="text" v-model="e.content[1]">
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="e.buttons[0].class" @click="e.isOpen = false">{{e.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="e.buttons[1].class">{{e.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="popup-background payment-add" :class="{'active':addPop.isOpen}" @click.self="addPop.isOpen = false">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <h2>{{addPop.title}}</h2>
+                        <button @click="addPop.isOpen = false"><i :class="addPop.icon"/></button>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[0]}}</h4>
+                        <input type="text" v-model="addPop.content[0]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[1]}}</h4>
+                        <input type="text" v-model="addPop.content[1]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[2]}}</h4>
+                        <input type="text" v-model="addPop.content[2]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[3]}}</h4>
+                        <input type="text" v-model="addPop.content[3]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[4]}}</h4>
+                        <input type="text" v-model="addPop.content[4]">
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="addPop.buttons[0].class" @click="addPop.isOpen = false">{{addPop.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="addPop.buttons[1].class">{{addPop.buttons[1].name}}</a>
+                      </div>
+                    </div>
                   </div>
                 </div>`,
       data() {
@@ -1406,7 +1484,9 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
             {
               name: "銀行轉帳(假)",
               claim: "請於下單後3天內轉帳至銀行戶口",
-              status: "開啟中",
+              statusO: { name: "開啟中", class: "open" },
+              statusC: { name: "已停用", class: "close" },
+              status: false,
               actions: [
                 { icon: "fas fa-edit", action: "編輯" },
                 { icon: "fas fa-ban", action: "啟用/停用" },
@@ -1416,7 +1496,9 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
             {
               name: "超商付款(假)",
               claim: "於各大超商，進行繳款付帳動作",
-              status: "開啟中",
+              statusO: { name: "開啟中", class: "open" },
+              statusC: { name: "已停用", class: "close" },
+              status: false,
               actions: [
                 { icon: "fas fa-edit", action: "編輯" },
                 { icon: "fas fa-ban", action: "啟用/停用" },
@@ -1424,6 +1506,91 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
               ],
             },
           ],
+          delPop: [
+            {
+              isOpen: false,
+              name: "銀行轉帳(假)",
+              icon: "fas fa-exclamation",
+              buttons: [
+                { name: "取消", class: "cancel" },
+                { name: "刪除", class: "delete" },
+              ],
+            },
+            {
+              isOpen: false,
+              name: "Convenience Store Payment(假)",
+              icon: "fas fa-exclamation",
+              buttons: [
+                { name: "取消", class: "cancel" },
+                { name: "刪除", class: "delete" },
+              ],
+            },
+          ],
+          editPop: [
+            {
+              isOpen: false,
+              title: "修改支付方式",
+              icon: "fas fa-times",
+              label: [
+                "顯示名稱",
+                "收款帳戶",
+                "收款帳戶號碼",
+                "收款人名稱",
+                "付款指示",
+              ],
+              content: [
+                "銀行轉帳(假)",
+                "好存銀行",
+                "12344-112323-1111",
+                "Jacko",
+                "請於下單後3天內轉帳至銀行戶口",
+              ],
+              buttons: [
+                { name: "取消", class: "cancel" },
+                { name: "更新", class: "update" },
+              ],
+            },
+            {
+              isOpen: false,
+              title: "修改支付方式",
+              icon: "fas fa-times",
+              label: [
+                "顯示名稱",
+                "收款帳戶",
+                "收款帳戶號碼",
+                "收款人名稱",
+                "付款指示",
+              ],
+              content: [
+                "超商付款(假)",
+                "好存銀行",
+                "12344-112323-1111",
+                "Jacko",
+                "於各大超商，進行繳款付帳動作",
+              ],
+              buttons: [
+                { name: "取消", class: "cancel" },
+                { name: "更新", class: "update" },
+              ],
+            },
+          ],
+          addPop: {
+            isOpen: false,
+            title: "新增支付方式",
+            icon: "fas fa-times",
+            label: [
+              "顯示名稱",
+              "收款帳戶",
+              "收款帳戶號碼",
+              "收款人名稱",
+              "付款指示",
+            ],
+            content: ["", "", "", "", ""],
+            buttons: [
+              { name: "取消", class: "cancel" },
+              { name: "新增", class: "create" },
+            ],
+          },
         };
       },
     },
@@ -1432,10 +1599,11 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
                   <div class="col-12">
                     <h4>{{title}}</h4>
                   </div>
-                  <div class="col-12 setting" v-for="s in settings" :class="[s.classname,{'active':s.isOpen}]" @click="s.isOpen = !s.isOpen">
-                    <div class="card-title">
+                  <div class="col-12 setting" v-for="(s,idx) in settings" :class="[s.classname,{'active':s.isOpen}]">
+                    <div class="card-title" @click="s.isOpen = !s.isOpen">
                       <p>
-                        <span>{{s.status}}</span>
+                        <span :class="s.statusO.class" v-if="s.status">{{s.statusO.name}}</span>
+                        <span :class="s.statusC.class" v-else>{{s.statusC.name}}</span>
                         {{s.item}}
                       </p>
                       <a href="javascript:;">
@@ -1445,12 +1613,12 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
                     </div>
                     <div class="card-body" v-if="s.isOpen === true">
                       <label class="checkbox">
-                        <input type="checkbox">
+                        <input type="checkbox" v-model="s.status">
                         <span class="knob"/>
                         <span class="bg"/>
                       </label>
                       <label class="content">{{s.item}}</label>
-                      <button>{{s.button}}</button>
+                      <button @click="s.isOpen = false;">{{s.button}}</button>
                     </div>
                   </div>
                 </div>`,
@@ -1462,29 +1630,35 @@ const shopSettingsTag = Vue.component("shop-settings-tag", {
             {
               isOpen: false,
               classname: "item1",
-              status: "已停用",
+              statusO: { name: "開啟中", class: "open" },
+              statusC: { name: "已停用", class: "close" },
+              status: false,
               item: "顯示商品庫存數量",
               actionname: "編輯",
               actionicon: "fas fa-edit",
-              button: "更新",
+              button: "關閉",
             },
             {
               isOpen: false,
               classname: "item2",
-              status: "已停用",
+              statusO: { name: "開啟中", class: "open" },
+              statusC: { name: "已停用", class: "close" },
+              status: false,
               item: "顯示已售商品數量",
               actionname: "編輯",
               actionicon: "fas fa-edit",
-              button: "更新",
+              button: "關閉",
             },
             {
               isOpen: false,
               classname: "item3",
-              status: "已停用",
+              statusO: { name: "開啟中", class: "open" },
+              statusC: { name: "已停用", class: "close" },
+              status: false,
               item: "購買須知",
               actionname: "編輯",
               actionicon: "fas fa-edit",
-              button: "更新",
+              button: "關閉",
             },
           ],
         };
@@ -1555,18 +1729,18 @@ const teammateTag = Vue.component("teammate-tag", {
       template: `<div id="admin">
                   <div class="col-12 row1">
                     <h1>{{title}}</h1>
-                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                    <button @click="addPop.isOpen = true"><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
                   <div class="row2">
                     <table>
                       <tr>
                         <th v-for="t in thead">{{t}}</th>
                       </tr>
-                      <tr v-for="a in admins">
+                      <tr v-for="(a,idx) in admins">
                         <td><i :class="a.icon"><span class="name">{{a.name}}</span><span :class="a.level[1]">{{a.level[0]}}</span></i></td>
                         <td><span :class="a.status[1]">{{a.status[0]}}</span></td>
                         <td> 
-                          <a href="javascript:;">
+                          <a href="javascript:;" @click="delPop[idx].isOpen = true">
                             <i :class="a.a_icon"/>
                             <span>{{a.action}}</span>
                           </a>
@@ -1576,6 +1750,36 @@ const teammateTag = Vue.component("teammate-tag", {
                         <td colspan="6" class="txt-r">每頁行數: <select><option v-for="p in pages" :value="p">{{p}}</option></select> - <i :class="i" v-for="i in icons"/></td>
                       </tr>
                     </table>
+                  </div>
+                  <div class="popup-background del" :class="{'active':d.isOpen}" @click.self="d.isOpen = false" v-for="d in delPop">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <i :class="d.icon"/>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <p>你確定刪除"{{d.name}}"?</p>
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="d.buttons[0].class" @click="d.isOpen = false">{{d.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="d.buttons[1].class">{{d.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="popup-background admin-add" :class="{'active':addPop.isOpen}" @click.self="addPop.isOpen = false">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <h2>{{addPop.title}}</h2>
+                        <button @click="addPop.isOpen = false"><i :class="addPop.icon"/></button>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[0]}}</h4>
+                        <input type="text" v-model="addPop.content[0]">
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="addPop.buttons[0].class" @click="addPop.isOpen = false">{{addPop.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="addPop.buttons[1].class">{{addPop.buttons[1].name}}</a>
+                      </div>
+                    </div>
                   </div>
                 </div>`,
       data() {
@@ -1603,6 +1807,28 @@ const teammateTag = Vue.component("teammate-tag", {
           ],
           pages: [10, 20, 50, 100],
           icons: ["fas fa-arrow-left", "fas fa-arrow-right"],
+          delPop: [
+            {
+              isOpen: false,
+              name: "新管理者",
+              icon: "fas fa-exclamation",
+              buttons: [
+                { name: "取消", class: "cancel" },
+                { name: "刪除", class: "delete" },
+              ],
+            },
+          ],
+          addPop: {
+            isOpen: false,
+            title: "新增管理者",
+            icon: "fas fa-times",
+            label: ["管理者名稱"],
+            content: [""],
+            buttons: [
+              { name: "取消", class: "cancel" },
+              { name: "新增", class: "create" },
+            ],
+          },
         };
       },
     },
@@ -1610,7 +1836,7 @@ const teammateTag = Vue.component("teammate-tag", {
       template: `<div id="helper">
                   <div class="col-12 row1">
                     <h1>{{title}}</h1>
-                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                    <button @click="addPop.isOpen = true"><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
                   <div class="row2">
                     <table>
@@ -1625,6 +1851,22 @@ const teammateTag = Vue.component("teammate-tag", {
                       </tr>
                     </table>
                   </div>
+                  <div class="popup-background helper-add" :class="{'active':addPop.isOpen}" @click.self="addPop.isOpen = false">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <h2>{{addPop.title}}</h2>
+                        <button @click="addPop.isOpen = false"><i :class="addPop.icon"/></button>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[0]}}</h4>
+                        <input type="text" v-model="addPop.content[0]">
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="addPop.buttons[0].class" @click="addPop.isOpen = false">{{addPop.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="addPop.buttons[1].class">{{addPop.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div>
                 </div>`,
       data() {
         return {
@@ -1634,6 +1876,17 @@ const teammateTag = Vue.component("teammate-tag", {
           result: "無符合資料",
           pages: [10, 20, 50, 100],
           icons: ["fas fa-arrow-left", "fas fa-arrow-right"],
+          addPop: {
+            isOpen: false,
+            title: "新增工作人員",
+            icon: "fas fa-times",
+            label: ["工作人員名稱"],
+            content: [""],
+            buttons: [
+              { name: "取消", class: "cancel" },
+              { name: "新增", class: "create" },
+            ],
+          },
         };
       },
     },
@@ -2137,7 +2390,15 @@ const ordersEnTag = Vue.component("orders-en-tag", {
                       <i :class="searchIcons"/>
                       <input type="text" :placeholder="placeholder">
                     </div>
-                    <button><i :class="filter.icon"></i>{{filter.name}}</button>
+                    <button @click="filterPop.isOpen = !filterPop.isOpen">
+                      <i :class="filter.icon"></i>{{filter.name}}
+                    </button>
+                    <div class="filterPop" :class="{'active':filterPop.isOpen}">
+                      <h3>{{filterPop.title}}</h3>
+                      <label>{{filterPop.label}}</label>
+                      <select><option v-for="s in filterPop.selects">{{s}}</option></select>
+                      <button @click.self="filterPop.isOpen = false">{{filterPop.button}}</button>
+                    </div>
                   </div>
                   <div class="row2">
                     <table>
@@ -2162,6 +2423,21 @@ const ordersEnTag = Vue.component("orders-en-tag", {
       searchIcons: "fas fa-search",
       placeholder: "ID / Name / Phone",
       filter: { name: "FILTER", icon: "fas fa-filter" },
+      filterPop: {
+        isOpen: false,
+        title: "Filter by order status",
+        label: "Select order status",
+        selects: [
+          "Pending Payment",
+          "Pending Payment Confirmation",
+          "Payment Success",
+          "All Shipped",
+          "Partial Delivered",
+          "All Delivered",
+          "Cancel Oreder",
+        ],
+        button: "DONE",
+      },
       thead: [
         "Order ID",
         "Customer Name",
@@ -2193,11 +2469,11 @@ const ordersEnTag = Vue.component("orders-en-tag", {
 });
 const productsEnTag = Vue.component("products-en-tag", {
   template: `<div id="products" :class="{'active':isOpen}">
-              <div class="wrapper">
+                <div class="wrapper">
                 <div class="container">
                   <div class="col-12 row1">
                     <h1>{{title}}</h1>
-                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                    <button @click="addPop.isOpen = true"><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
                   <div class="row2">
                     <table>
@@ -2206,24 +2482,108 @@ const productsEnTag = Vue.component("products-en-tag", {
                       </tr>
                       <tr class="product">
                         <td>{{products[0]}}</td>
-                        <td>{{products[1]}}</td>
+                        <td><img :src="products[1]" class="image"></td>
                         <td><p v-for="p in products[2]">{{p}}</p></td>
                         <td>{{products[3]}}</td>
                         <td>{{products[4]}}</td>
                         <td><select><option v-for="p in products[5]">{{p}}</option></select></td>
                         <td>
-                          <a href="javascript:;" v-for="p in products[6]">
-                            <i :class="p.icon"/>
-                            <span>{{p.action}}</span>
+                          <a href="javascript:;"  @click="editPop.isOpen = true">
+                            <i :class="products[6][0].icon"/>
+                            <span>{{products[6][0].action}}</span>
+                          </a>
+                          <a href="javascript:;" @click="delPop.isOpen = true">
+                            <i :class="products[6][1].icon"/>
+                            <span>{{products[6][1].action}}</span>
                           </a>
                         </td>
                       </tr>
                       <tr>
-                        <td colspan="7" class="txt-r">Roes per page: <select><option v-for="r in rows" :value="r">{{r}}</option></select>page: <select><option v-for="p in pages" :value="p">{{p}}</option></select> 1/1 of 1 <i :class="i" v-for="i in icons"/></td>
+                        <td colspan="7" class="txt-r">Rows per page: <select><option v-for="r in rows" :value="r">{{r}}</option></select>pages: <select><option v-for="p in pages" :value="p">{{p}}</option></select> 1/1 of 1 <i :class="i" v-for="i in icons"/></td>
                       </tr>
                     </table>
                   </div>
                 </div>
+                <div class="popup-background add" :class="{'active':addPop.isOpen}" @click.self="addPop.isOpen = false">
+                  <div class="popup">
+                    <div class="col-12 modal-head">
+                      <h2>{{addPop.title}}</h2>
+                      <select><option v-for="p in products[5]">{{p}}</option></select>
+                    </div>
+                    <div class="col-12 modal-body">
+                      <h4>{{addPop.items[0]}}</h4>
+                      <input type="text">
+                    </div>
+                    <div class="col-12 modal-body">
+                      <h4>{{addPop.items[1]}}</h4>
+                      <input type="file">
+                    </div>
+                    <div class="col-12 modal-body">
+                      <h4>{{addPop.items[2]}}</h4>
+                      <table>
+                        <tr>
+                          <th v-for="t in addPop.tableHead">{{t}}</th>
+                        </tr>
+                        <tr v-for="v in addPop.variants">
+                          <td><input type="text" v-model="v.name" class="variants"></td>
+                          <td><input type="number" v-model="v.price" class="variants"></td>
+                          <td class="amount"><input type="number" v-model="v.remain" class="remain"><span>/</span><input type="number" v-model="v.total"></td>
+                        </tr>
+                      </table>
+                    </div>
+                    <div class="col-12 modal-footer">
+                      <a href="javascript:;" :class="addPop.buttons[0].class" @click="addPop.isOpen = false">{{addPop.buttons[0].name}}</a>
+                      <a href="javascript:;" :class="addPop.buttons[1].class">{{addPop.buttons[1].name}}</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="popup-background edit" :class="{'active':editPop.isOpen}" @click.self="editPop.isOpen = false">
+                  <div class="popup">
+                    <div class="col-12 modal-head">
+                      <h2>{{editPop.title}}</h2>
+                      <select><option v-for="p in products[5]">{{p}}</option></select>
+                    </div>
+                    <div class="col-12 modal-body">
+                      <h4>{{editPop.items[0]}}</h4>
+                      <input type="text" v-model="products[0]">
+                    </div>
+                    <div class="col-12 modal-body">
+                      <h4>{{editPop.items[1]}}</h4>
+                      <img :src="editPop.imgpath">
+                    </div>
+                    <div class="col-12 modal-body">
+                      <h4>{{editPop.items[2]}}</h4>
+                      <table>
+                        <tr>
+                          <th v-for="t in editPop.tableHead">{{t}}</th>
+                        </tr>
+                        <tr v-for="v in editPop.variants">
+                          <td><input type="text" v-model="v.name" class="variants"></td>
+                          <td><input type="number" v-model="v.price" class="variants"></td>
+                          <td class="amount"><input type="number" v-model="v.remain" class="remain"><span>/</span><input type="number" v-model="v.total"></td>
+                        </tr>
+                      </table>
+                    </div>
+                    <div class="col-12 modal-footer">
+                      <a href="javascript:;" :class="editPop.buttons[0].class" @click="editPop.isOpen = false">{{editPop.buttons[0].name}}</a>
+                      <a href="javascript:;" :class="editPop.buttons[1].class">{{editPop.buttons[1].name}}</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="popup-background del" :class="{'active':delPop.isOpen}" @click.self="delPop.isOpen = false">
+                  <div class="popup">
+                    <div class="col-12 modal-head">
+                      <i :class="delPop.icon"/>
+                    </div>
+                    <div class="col-12 modal-body">
+                      <p>Are you sure to delete  " {{products[0]}} " ?</p>
+                    </div>
+                    <div class="col-12 modal-footer">
+                      <a href="javascript:;" :class="delPop.buttons[0].class" @click="delPop.isOpen = false">{{delPop.buttons[0].name}}</a>
+                      <a href="javascript:;" :class="delPop.buttons[1].class">{{delPop.buttons[1].name}}</a>
+                    </div>
+                  </div>
+                </div>   
               </div>
             </div>`,
   data() {
@@ -2242,7 +2602,7 @@ const productsEnTag = Vue.component("products-en-tag", {
       ],
       products: [
         "Demo Product",
-        "Fake Photo",
+        "./images/cart.jpg",
         ["Red $100[10]", "Blue $100[10]", "Yellow $100[10]"],
         "30",
         "0",
@@ -2255,6 +2615,41 @@ const productsEnTag = Vue.component("products-en-tag", {
       rows: [10, 20, 30, 40],
       pages: [1],
       icons: ["fas fa-arrow-left", "fas fa-arrow-right"],
+      addPop: {
+        isOpen: false,
+        title: "Create Products",
+        items: ["Product Name", "Product Images", "Variants"],
+        tableHead: ["Variants(e.g. size/color)", "Price", "Remain/Total"],
+        variants: [{ name: "", price: 0, remain: 0, total: 0 }],
+        buttons: [
+          { name: "Cancel", class: "cancel" },
+          { name: "create", class: "create" },
+        ],
+      },
+      editPop: {
+        isOpen: false,
+        title: "Update Product",
+        imgpath: "./images/cart.jpg",
+        items: ["Product Name", "Product Images", "Variants"],
+        tableHead: ["Variants(e.g. size/color)", "Price", "Remain/Total"],
+        variants: [
+          { name: "Red", price: 100, remain: 10, total: 10 },
+          { name: "Blue", price: 100, remain: 10, total: 10 },
+          { name: "Yellow", price: 100, remain: 10, total: 10 },
+        ],
+        buttons: [
+          { name: "Cancel", class: "cancel" },
+          { name: "Update", class: "update" },
+        ],
+      },
+      delPop: {
+        isOpen: false,
+        icon: "fas fa-exclamation",
+        buttons: [
+          { name: "Cancel", class: "cancel" },
+          { name: "Delete", class: "delete" },
+        ],
+      },
     };
   },
   methods: {
@@ -2278,7 +2673,7 @@ const promoCodeEnTag = Vue.component("promo-code-en-tag", {
                 <div class="container">
                   <div class="col-12 row1">
                     <h1>{{title}}</h1>
-                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                    <button @click="promoCodeAddPop.isOpen = true"><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
                   <div class="row2">
                     <table>
@@ -2289,9 +2684,61 @@ const promoCodeEnTag = Vue.component("promo-code-en-tag", {
                         <td colspan="6" class="txt-c">{{result}}</td>
                       </tr>
                       <tr>
-                        <td colspan="6" class="txt-r">Rows per page: <select><option v-for="p in pages" :value="p">{{p}}</option></select> - <i :class="i" v-for="i in icons"/></td>
+                        <td colspan="6" class="txt-r">Rows per pages: <select><option v-for="p in pages" :value="p">{{p}}</option></select> - <i :class="i" v-for="i in icons"/></td>
                       </tr>
                     </table>
+                  </div>
+                </div>
+                <div class="popup-background promo-code-add" :class="{'active':promoCodeAddPop.isOpen}" @click.self="promoCodeAddPop.isOpen = false">
+                  <div class="popup">
+                    <div class="col-12 modal-head">
+                      <h2>{{promoCodeAddPop.title}}</h2>
+                      <button @click="promoCodeAddPop.isOpen = false"><i :class="promoCodeAddPop.icon"></i></button>
+                    </div>
+                    <div class="col-12 modal-body">
+                      <div class="col-12 col-md-6">
+                        <h4>{{promoCodeAddPop.items[0]}}</h4>
+                        <label>{{promoCodeAddPop.subitems[0]}}</label>
+                        <input type="text">
+                      </div>
+                      <div class="col-12 col-md-6 times">
+                        <label>{{promoCodeAddPop.subitems[1]}}</label>
+                        <input type="number">
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <h4>{{promoCodeAddPop.items[1]}}</h4>
+                        <input type="radio" checked="true">
+                        <label>{{promoCodeAddPop.date}}</label>
+                      </div>
+                      <div class="col-12 col-md-3" v-for="v in promoCodeAddPop.validDate">
+                        <label>{{v}}</label>
+                        <input type="date">
+                      </div>
+                      <div class="col-6">
+                        <input type="radio" name="discount" :value="promoCodeAddPop.discount[0]" v-model="promoCodeAddPop.picked" :id="promoCodeAddPop.discount[0]">
+                        <label :for="promoCodeAddPop.discount[0]">{{promoCodeAddPop.discount[0]}}</label>
+                        <input type="radio" name="discount" :value="promoCodeAddPop.discount[1]" v-model="promoCodeAddPop.picked" :id="promoCodeAddPop.discount[1]">
+                        <label :for="promoCodeAddPop.discount[1]">{{promoCodeAddPop.discount[1]}}</label>
+                      </div>
+                      <div class="col-12 col-md-6" v-if="promoCodeAddPop.picked === '按金額折扣'">
+                        <label>{{promoCodeAddPop.subdiscount[0]}}</label>
+                        <span class="dollar">$</span><input type="number" class="money">
+                      </div>
+                      <div class="col-12 col-md-6" v-else>
+                        <label>{{promoCodeAddPop.subdiscount[1]}}</label>
+                        <input type="number"><span class="percent">%</span>
+                      </div>
+                      <div class="col-12">
+                        <h4>{{promoCodeAddPop.items[2]}}</h4>
+                        <select>
+                          <option v-for="l in promoCodeAddPop.limits" :value="l">{{l}}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-12 modal-footer">
+                      <a href="javascript:;" :class="promoCodeAddPop.buttons[0].class" @click="promoCodeAddPop.isOpen = false">{{promoCodeAddPop.buttons[0].name}}</a>
+                      <a href="javascript:;" :class="promoCodeAddPop.buttons[1].class">{{promoCodeAddPop.buttons[1].name}}</a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2305,6 +2752,33 @@ const promoCodeEnTag = Vue.component("promo-code-en-tag", {
       result: "No data available",
       pages: [10, 20, 50, 100],
       icons: ["fas fa-arrow-left", "fas fa-arrow-right"],
+      promoCodeAddPop: {
+        isOpen: false,
+        title: "Promo Code Settings",
+        icon: "fas fa-times",
+        items: [
+          "Create Promo Code",
+          "Active Date",
+          "Discount Type and Amount",
+          "Applies to",
+        ],
+        subitems: ["Code Name", "Max. number of times can be used"],
+        date: "Date Range",
+        validDate: ["Start Date", "End Date"],
+        discount: ["Fixed Amount Discount", "Percentage Discount"],
+        subdiscount: ["Discounted Amount", "Discounted Percentage"],
+        picked: "Fixed Amount Discount",
+        limits: [
+          "All products",
+          "Selected products only",
+          "Regular price products",
+          "Minimum purchase amount",
+        ],
+        buttons: [
+          { name: "Cancel", class: "cancel" },
+          { name: "Create", class: "create" },
+        ],
+      },
     };
   },
   methods: {
@@ -2373,7 +2847,7 @@ const subscriptionPlanEnTag = Vue.component("subscription-plan-en-tag", {
                     </div>
                     <div class="card-footer">
                       <p>{{free_content[0]}}{{free_maxnum}}</p>
-                      <p><span class="heightlight">{{free_maxnum_h}}</span> {{free_content[1]}}</p>
+                      <p>{{free_content[1]}}<span class="heightlight">{{free_maxnum_h}}</span>{{free_content[2]}}</p>
                     </div>
                   </div>
                   <div class="col-12 col-lg-8 pro">
@@ -2394,9 +2868,23 @@ const subscriptionPlanEnTag = Vue.component("subscription-plan-en-tag", {
                       </div>
                     </div>
                     <div class="card-footer2 clearfix">
-                      <button class="levelup">{{button}}</button>
+                      <button class="levelup" @click="planUpdatePop.isOpen = true">{{button}}</button>
                     </div>
                   </div>
+                  <div class="popup-background plan-update" :class="{'active':planUpdatePop.isOpen}" @click.self="planUpdatePop.isOpen = false">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <i :class="planUpdatePop.icon"/>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <p>{{planUpdatePop.content}}</p>
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="planUpdatePop.buttons[0].class" @click="planUpdatePop.isOpen = false">{{planUpdatePop.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="planUpdatePop.buttons[1].class">{{planUpdatePop.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div> 
                 </div>`,
       data() {
         return {
@@ -2436,6 +2924,16 @@ const subscriptionPlanEnTag = Vue.component("subscription-plan-en-tag", {
             { icon: "fas fa-check", content: "Incentivize return purchase" },
           ],
           button: "UPGRADE PLAN",
+          planUpdatePop: {
+            isOpen: false,
+            icon: "fas fa-exclamation",
+            content:
+              "You will be directly to an external site for the checkout process and return to MyCart shortly after . Please provide the credit card info for authorizing monthly subscription fee. Recurring fee will be automatically charged from your credit card on a monthly basis based on the number of active users.",
+            buttons: [
+              { name: "Back", class: "cancel" },
+              { name: "Continue", class: "continue" },
+            ],
+          },
         };
       },
     },
@@ -2590,25 +3088,92 @@ const shopSettingsEnTag = Vue.component("shop-settings-en-tag", {
       template: `<div id="shipping" class="clearfix">
                   <div class="col-12 row1">
                     <h3>{{title}}</h3>
-                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                    <button @click="addPop.isOpen = true"><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
                   <div class="row2">
                     <table>
                       <tr>
                         <th v-for="t in thead">{{t.name}}</th>
                       </tr>
-                      <tr class="shipping" v-for="s in shippings">
+                      <tr class="shipping" v-for="(s,idx) in shippings">
                         <td>{{s.name}}</td>
                         <td>{{s.claim}}</td>
-                        <td>{{s.status}}</td>
+                        <td >
+                          <span :class="s.statusO.class" v-if="s.status">{{s.statusO.name}}</span>
+                          <span :class="s.statusC.class" v-else>{{s.statusC.name}}</span>
+                        </td>
                         <td>
-                          <a href="javascript:;" v-for="sa in s.actions">
-                            <i :class="sa.icon"/>
-                            <span>{{sa.action}}</span>
+                          <a href="javascript:;">
+                            <i :class="s.actions[0].icon" @click="editPop[idx].isOpen = true"/>
+                            <span>{{s.actions[0].action}}</span>
+                          </a>
+                          <a href="javascript:;">
+                            <i :class="s.actions[1].icon" @click="shippings[idx].status = !shippings[idx].status"/>
+                            <span>{{s.actions[1].action}}</span>
+                          </a>
+                          <a href="javascript:;">
+                            <i :class="s.actions[2].icon" @click="delPop[idx].isOpen = true" />
+                            <span>{{s.actions[2].action}}</span>
                           </a>
                         </td>
                       </tr>
                     </table>
+                  </div>
+                  <div class="popup-background del" :class="{'active':d.isOpen}" @click.self="d.isOpen = false" v-for="d in delPop">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <i :class="d.icon"/>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <p>Are you sure to delete "{{d.name}}"?</p>
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="d.buttons[0].class" @click="d.isOpen = false">{{d.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="d.buttons[1].class">{{d.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="popup-background shipping-edit" :class="{'active':e.isOpen}" @click.self="e.isOpen = false" v-for="e in editPop">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <h2>{{e.title}}</h2>
+                        <button @click="e.isOpen = false"><i :class="e.icon"/></button>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{e.label[0]}}</h4>
+                        <input type="text" v-model="e.content[0]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{e.label[1]}}</h4>
+                        <input type="text" v-model="e.content[1]">
+                        <p>{{e.noti}}</p>
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="e.buttons[0].class" @click="e.isOpen = false">{{e.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="e.buttons[1].class">{{e.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="popup-background shipping-add" :class="{'active':addPop.isOpen}" @click.self="addPop.isOpen = false">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <h2>{{addPop.title}}</h2>
+                        <button @click="addPop.isOpen = false"><i :class="addPop.icon"/></button>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[0]}}</h4>
+                        <input type="text" v-model="addPop.content[0]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[1]}}</h4>
+                        <input type="text" v-model="addPop.content[1]">
+                        <p>{{addPop.noti}}</p>
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="addPop.buttons[0].class" @click="addPop.isOpen = false">{{addPop.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="addPop.buttons[1].class">{{addPop.buttons[1].name}}</a>
+                      </div>
+                    </div>
                   </div>
                 </div>`,
       data() {
@@ -2626,7 +3191,9 @@ const shopSettingsEnTag = Vue.component("shop-settings-en-tag", {
               name: "DBQ express delivery(Fake)",
               claim:
                 "Free shipping on purchases over $ 300, delivery on delivery under $ 300",
-              status: "Active",
+              statusO: { name: "Active", class: "open" },
+              statusC: { name: "Inactive", class: "close" },
+              status: false,
               actions: [
                 { icon: "fas fa-edit", action: "Edit" },
                 { icon: "fas fa-ban", action: "Enable/Disable" },
@@ -2637,7 +3204,9 @@ const shopSettingsEnTag = Vue.component("shop-settings-en-tag", {
               name: "QS express delivery(Fake)",
               claim:
                 "Free shipping on purchases over $ 600, delivery on delivery under $ 600",
-              status: "Active",
+              statusO: { name: "Active", class: "open" },
+              statusC: { name: "Inactive", class: "close" },
+              status: false,
               actions: [
                 { icon: "fas fa-edit", action: "Edit" },
                 { icon: "fas fa-ban", action: "Enable/Disable" },
@@ -2648,7 +3217,9 @@ const shopSettingsEnTag = Vue.component("shop-settings-en-tag", {
               name: "DBS express delivery(Fake)",
               claim:
                 "Free shipping on purchases over $ 1000, delivery on delivery under $ 1000",
-              status: "Active",
+              statusO: { name: "Active", class: "open" },
+              statusC: { name: "Inactive", class: "close" },
+              status: false,
               actions: [
                 { icon: "fas fa-edit", action: "Edit" },
                 { icon: "fas fa-ban", action: "Enable/Disable" },
@@ -2656,6 +3227,94 @@ const shopSettingsEnTag = Vue.component("shop-settings-en-tag", {
               ],
             },
           ],
+          delPop: [
+            {
+              isOpen: false,
+              name: "DBQ express delivery(Fake)",
+              icon: "fas fa-exclamation",
+              buttons: [
+                { name: "Cancel", class: "cancel" },
+                { name: "Delete", class: "delete" },
+              ],
+            },
+            {
+              isOpen: false,
+              name: "QS express delivery(Fake)",
+              icon: "fas fa-exclamation",
+              buttons: [
+                { name: "Cancel", class: "cancel" },
+                { name: "Delete", class: "delete" },
+              ],
+            },
+            {
+              isOpen: false,
+              name: "DBS express delivery(Fake)",
+              icon: "fas fa-exclamation",
+              buttons: [
+                { name: "Cancel", class: "cancel" },
+                { name: "Delete", class: "delete" },
+              ],
+            },
+          ],
+          editPop: [
+            {
+              isOpen: false,
+              title: "Edit Shipping Method",
+              icon: "fas fa-times",
+              label: ["Display Name", "Shipping Instruction"],
+              content: [
+                "DBQ express delivery(Fake)",
+                "Free shipping on purchases over $ 300, delivery on delivery under $ 300",
+              ],
+              noti: "Instruction will be shown in the checkout page!",
+              buttons: [
+                { name: "Cancel", class: "cancel" },
+                { name: "Update", class: "update" },
+              ],
+            },
+            {
+              isOpen: false,
+              title: "Edit Shipping Method",
+              icon: "fas fa-times",
+              label: ["Display Name", "Shipping Instruction"],
+              content: [
+                "QS express delivery(Fake)",
+                "Free shipping on purchases over $ 600, delivery on delivery under $ 600",
+              ],
+              noti: "Instruction will be shown in the checkout page!",
+              buttons: [
+                { name: "Cancel", class: "cancel" },
+                { name: "Update", class: "update" },
+              ],
+            },
+            {
+              isOpen: false,
+              title: "Edit Shipping Method",
+              icon: "fas fa-times",
+              label: ["Display Name", "Shipping Instruction"],
+              content: [
+                "DBS express delivery(Fake)",
+                "Free shipping on purchases over $ 1000, delivery on delivery under $ 1000",
+              ],
+              noti: "Instruction will be shown in the checkout page!",
+              buttons: [
+                { name: "Cancel", class: "cancel" },
+                { name: "Update", class: "update" },
+              ],
+            },
+          ],
+          addPop: {
+            isOpen: false,
+            title: "Add New Shipping Method",
+            icon: "fas fa-times",
+            label: ["Display Name", "Shipping Instruction"],
+            content: ["", ""],
+            noti: "Instruction will be shown in the checkout page!",
+            buttons: [
+              { name: "Cancel", class: "cancel" },
+              { name: "Create", class: "create" },
+            ],
+          },
         };
       },
     },
@@ -2663,25 +3322,102 @@ const shopSettingsEnTag = Vue.component("shop-settings-en-tag", {
       template: `<div id="payment" class="clearfix">
                   <div class="col-12 row1">
                     <h3>{{title}}</h3>
-                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                    <button @click="addPop.isOpen = true"><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
                   <div class="row2">
                     <table>
                       <tr>
                         <th v-for="t in thead">{{t.name}}</th>
                       </tr>
-                      <tr class="payment" v-for="p in payments">
+                      <tr class="payment" v-for="(p,idx) in payments">
                         <td>{{p.name}}</td>
                         <td>{{p.claim}}</td>
-                        <td>{{p.status}}</td>
                         <td>
-                          <a href="javascript:;" v-for="pa in p.actions">
-                            <i :class="pa.icon"/>
-                            <span>{{pa.action}}</span>
+                          <span :class="p.statusO.class" v-if="p.status">{{p.statusO.name}}</span>
+                          <span :class="p.statusC.class" v-else>{{p.statusC.name}}</span>
+                        </td>
+                        <td>
+                          <a href="javascript:;">
+                            <i :class="p.actions[0].icon" @click="editPop[idx].isOpen = true"/>
+                            <span>{{p.actions[0].action}}</span>
+                          </a>
+                          <a href="javascript:;">
+                            <i :class="p.actions[1].icon" @click="payments[idx].status = !payments[idx].status"/>
+                            <span>{{p.actions[1].action}}</span>
+                          </a>
+                          <a href="javascript:;">
+                            <i :class="p.actions[2].icon" @click="delPop[idx].isOpen = true" />
+                            <span>{{p.actions[2].action}}</span>
                           </a>
                         </td>
                       </tr>
                     </table>
+                  </div>
+                  <div class="popup-background del" :class="{'active':d.isOpen}" @click.self="d.isOpen = false" v-for="d in delPop">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <i :class="d.icon"/>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <p>Are you sure to delete " {{d.name}} " ?</p>
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="d.buttons[0].class" @click="d.isOpen = false">{{d.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="d.buttons[1].class">{{d.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="popup-background payment-edit" :class="{'active':e.isOpen}" @click.self="e.isOpen = false" v-for="e in editPop">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <h2>{{e.title}}</h2>
+                        <button @click="e.isOpen = false"><i :class="e.icon"/></button>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{e.label[0]}}</h4>
+                        <input type="text" v-model="e.content[0]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{e.label[1]}}</h4>
+                        <input type="text" v-model="e.content[1]">
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="e.buttons[0].class" @click="e.isOpen = false">{{e.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="e.buttons[1].class">{{e.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="popup-background payment-add" :class="{'active':addPop.isOpen}" @click.self="addPop.isOpen = false">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <h2>{{addPop.title}}</h2>
+                        <button @click="addPop.isOpen = false"><i :class="addPop.icon"/></button>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[0]}}</h4>
+                        <input type="text" v-model="addPop.content[0]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[1]}}</h4>
+                        <input type="text" v-model="addPop.content[1]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[2]}}</h4>
+                        <input type="text" v-model="addPop.content[2]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[3]}}</h4>
+                        <input type="text" v-model="addPop.content[3]">
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[4]}}</h4>
+                        <input type="text" v-model="addPop.content[4]">
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="addPop.buttons[0].class" @click="addPop.isOpen = false">{{addPop.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="addPop.buttons[1].class">{{addPop.buttons[1].name}}</a>
+                      </div>
+                    </div>
                   </div>
                 </div>`,
       data() {
@@ -2696,10 +3432,12 @@ const shopSettingsEnTag = Vue.component("shop-settings-en-tag", {
           ],
           payments: [
             {
-              name: "Money transfer(Fake)",
+              name: "Bank transfer(Fake)",
               claim:
                 "Please transfer funds to bank account within 3 days after placing the order",
-              status: "Active",
+              statusO: { name: "Active", class: "open" },
+              statusC: { name: "Inactive", class: "close" },
+              status: false,
               actions: [
                 { icon: "fas fa-edit", action: "Edit" },
                 { icon: "fas fa-ban", action: "Enable/Disable" },
@@ -2710,7 +3448,9 @@ const shopSettingsEnTag = Vue.component("shop-settings-en-tag", {
               name: "Convenience Store Payment(Fake)",
               claim:
                 "Carry out payment and payment at major convenience stores",
-              status: "Active",
+              statusO: { name: "Active", class: "open" },
+              statusC: { name: "Inactive", class: "close" },
+              status: false,
               actions: [
                 { icon: "fas fa-edit", action: "Edit" },
                 { icon: "fas fa-ban", action: "Enable/Disable" },
@@ -2718,6 +3458,91 @@ const shopSettingsEnTag = Vue.component("shop-settings-en-tag", {
               ],
             },
           ],
+          delPop: [
+            {
+              isOpen: false,
+              name: "Bank Transfer(Fake)",
+              icon: "fas fa-exclamation",
+              buttons: [
+                { name: "Cancel", class: "cancel" },
+                { name: "Delete", class: "delete" },
+              ],
+            },
+            {
+              isOpen: false,
+              name: "Convenience Store Payment(Fake)",
+              icon: "fas fa-exclamation",
+              buttons: [
+                { name: "Cancel", class: "cancel" },
+                { name: "Delete", class: "delete" },
+              ],
+            },
+          ],
+          editPop: [
+            {
+              isOpen: false,
+              title: "Edit Payment Method",
+              icon: "fas fa-times",
+              label: [
+                "Display Name",
+                "Account Name",
+                "Account Number",
+                "Account Payee Name",
+                "Payment Instruction",
+              ],
+              content: [
+                "Bank Transfer(Fake)",
+                "Good Store Bank",
+                "12344-112323-1111",
+                "Jacko",
+                "Please transfer funds to bank account within 3 days after placing the order",
+              ],
+              buttons: [
+                { name: "Cancel", class: "cancel" },
+                { name: "Update", class: "update" },
+              ],
+            },
+            {
+              isOpen: false,
+              title: "Edit Payment Method",
+              icon: "fas fa-times",
+              label: [
+                "Display Name",
+                "Account Name",
+                "Account Number",
+                "Account Payee Name",
+                "Payment Instruction",
+              ],
+              content: [
+                "Convenience Store Payment(Fake)",
+                "Good Store Bank",
+                "12344-112323-1111",
+                "Jacko",
+                "Carry out payment and payment at major convenience stores",
+              ],
+              buttons: [
+                { name: "Cancel", class: "cancel" },
+                { name: "Update", class: "update" },
+              ],
+            },
+          ],
+          addPop: {
+            isOpen: false,
+            title: "New Payment Method",
+            icon: "fas fa-times",
+            label: [
+              "Display Name",
+              "Account Name",
+              "Account Number",
+              "Account Payee Name",
+              "Payment Instruction",
+            ],
+            content: ["", "", "", "", ""],
+            buttons: [
+              { name: "Cancel", class: "cancel" },
+              { name: "Create", class: "create" },
+            ],
+          },
         };
       },
     },
@@ -2726,10 +3551,11 @@ const shopSettingsEnTag = Vue.component("shop-settings-en-tag", {
                   <div class="col-12">
                     <h4>{{title}}</h4>
                   </div>
-                  <div class="col-12 setting" v-for="s in settings" :class="[s.classname,{'active':s.isOpen}]" @click="s.isOpen = !s.isOpen">
-                    <div class="card-title">
+                  <div class="col-12 setting" v-for="(s,idx) in settings" :class="[s.classname,{'active':s.isOpen}]">
+                    <div class="card-title" @click="s.isOpen = !s.isOpen">
                       <p>
-                        <span>{{s.status}}</span>
+                        <span :class="s.statusO.class" v-if="s.status">{{s.statusO.name}}</span>
+                        <span :class="s.statusC.class" v-else>{{s.statusC.name}}</span>
                         {{s.item}}
                       </p>
                       <a href="javascript:;">
@@ -2737,14 +3563,14 @@ const shopSettingsEnTag = Vue.component("shop-settings-en-tag", {
                             <span>{{s.actionname}}</span>
                       </a>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" v-if="s.isOpen === true">
                       <label class="checkbox">
-                        <input type="checkbox">
+                        <input type="checkbox" v-model="s.status">
                         <span class="knob"/>
                         <span class="bg"/>
                       </label>
                       <label class="content">{{s.item}}</label>
-                      <button>{{s.button}}</button>
+                      <button @click="s.isOpen = false;">{{s.button}}</button>
                     </div>
                   </div>
                 </div>`,
@@ -2756,29 +3582,35 @@ const shopSettingsEnTag = Vue.component("shop-settings-en-tag", {
             {
               isOpen: false,
               classname: "item1",
-              status: "Inactive",
+              statusO: { name: "Active", class: "open" },
+              statusC: { name: "Inactive", class: "close" },
+              status: false,
               item: "Show product available inventory",
               actionname: "Edit",
               actionicon: "fas fa-edit",
-              button: "UPDATE",
+              button: "Close",
             },
             {
               isOpen: false,
               classname: "item2",
-              status: "Inactive",
+              statusO: { name: "Active", class: "open" },
+              statusC: { name: "Inactive", class: "close" },
+              status: false,
               item: "Show numbers of products sold",
               actionname: "Edit",
               actionicon: "fas fa-edit",
-              button: "UPDATE",
+              button: "Close",
             },
             {
               isOpen: false,
               classname: "item3",
-              status: "Inactive",
+              statusO: { name: "Active", class: "open" },
+              statusC: { name: "Inactive", class: "close" },
+              status: false,
               item: "General Notice for Customers",
               actionname: "Edit",
               actionicon: "fas fa-edit",
-              button: "UPDATE",
+              button: "Close",
             },
           ],
         };
@@ -2849,18 +3681,18 @@ const teammateEnTag = Vue.component("teammate-en-tag", {
       template: `<div id="admin">
                   <div class="col-12 row1">
                     <h1>{{title}}</h1>
-                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                    <button @click="addPop.isOpen = true"><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
                   <div class="row2">
                     <table>
                       <tr>
                         <th v-for="t in thead">{{t}}</th>
                       </tr>
-                      <tr v-for="a in admins">
+                      <tr v-for="(a,idx) in admins">
                         <td><i :class="a.icon"><span class="name">{{a.name}}</span><span :class="a.level[1]">{{a.level[0]}}</span></i></td>
                         <td><span :class="a.status[1]">{{a.status[0]}}</span></td>
                         <td> 
-                          <a href="javascript:;">
+                          <a href="javascript:;" @click="delPop[idx].isOpen = true">
                             <i :class="a.a_icon"/>
                             <span>{{a.action}}</span>
                           </a>
@@ -2870,6 +3702,36 @@ const teammateEnTag = Vue.component("teammate-en-tag", {
                         <td colspan="6" class="txt-r">Rows per page: <select><option v-for="p in pages" :value="p">{{p}}</option></select> - <i :class="i" v-for="i in icons"/></td>
                       </tr>
                     </table>
+                  </div>
+                  <div class="popup-background del" :class="{'active':d.isOpen}" @click.self="d.isOpen = false" v-for="d in delPop">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <i :class="d.icon"/>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <p>Are you sure to delete " {{d.name}} " ?</p>
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="d.buttons[0].class" @click="d.isOpen = false">{{d.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="d.buttons[1].class">{{d.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="popup-background admin-add" :class="{'active':addPop.isOpen}" @click.self="addPop.isOpen = false">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <h2>{{addPop.title}}</h2>
+                        <button @click="addPop.isOpen = false"><i :class="addPop.icon"/></button>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[0]}}</h4>
+                        <input type="text" v-model="addPop.content[0]">
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="addPop.buttons[0].class" @click="addPop.isOpen = false">{{addPop.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="addPop.buttons[1].class">{{addPop.buttons[1].name}}</a>
+                      </div>
+                    </div>
                   </div>
                 </div>`,
       data() {
@@ -2897,6 +3759,28 @@ const teammateEnTag = Vue.component("teammate-en-tag", {
           ],
           pages: [10, 20, 50, 100],
           icons: ["fas fa-arrow-left", "fas fa-arrow-right"],
+          delPop: [
+            {
+              isOpen: false,
+              name: "New Admins",
+              icon: "fas fa-exclamation",
+              buttons: [
+                { name: "Cancel", class: "cancel" },
+                { name: "Delete", class: "delete" },
+              ],
+            },
+          ],
+          addPop: {
+            isOpen: false,
+            title: "New Amins",
+            icon: "fas fa-times",
+            label: ["Admin Name"],
+            content: [""],
+            buttons: [
+              { name: "Cancel", class: "cancel" },
+              { name: "Create", class: "create" },
+            ],
+          },
         };
       },
     },
@@ -2904,7 +3788,7 @@ const teammateEnTag = Vue.component("teammate-en-tag", {
       template: `<div id="helper">
                   <div class="col-12 row1">
                     <h1>{{title}}</h1>
-                    <button><i :class="button.icon"></i>{{button.name}}</button>
+                    <button @click="addPop.isOpen = true"><i :class="button.icon"></i>{{button.name}}</button>
                   </div>
                   <div class="row2">
                     <table>
@@ -2919,6 +3803,22 @@ const teammateEnTag = Vue.component("teammate-en-tag", {
                       </tr>
                     </table>
                   </div>
+                  <div class="popup-background helper-add" :class="{'active':addPop.isOpen}" @click.self="addPop.isOpen = false">
+                    <div class="popup">
+                      <div class="col-12 modal-head">
+                        <h2>{{addPop.title}}</h2>
+                        <button @click="addPop.isOpen = false"><i :class="addPop.icon"/></button>
+                      </div>
+                      <div class="col-12 modal-body">
+                        <h4>{{addPop.label[0]}}</h4>
+                        <input type="text" v-model="addPop.content[0]">
+                      </div>
+                      <div class="col-12 modal-footer">
+                        <a href="javascript:;" :class="addPop.buttons[0].class" @click="addPop.isOpen = false">{{addPop.buttons[0].name}}</a>
+                        <a href="javascript:;" :class="addPop.buttons[1].class">{{addPop.buttons[1].name}}</a>
+                      </div>
+                    </div>
+                  </div>
                 </div>`,
       data() {
         return {
@@ -2928,6 +3828,17 @@ const teammateEnTag = Vue.component("teammate-en-tag", {
           result: "No data available",
           pages: [10, 20, 50, 100],
           icons: ["fas fa-arrow-left", "fas fa-arrow-right"],
+          addPop: {
+            isOpen: false,
+            title: "New Assisant",
+            icon: "fas fa-times",
+            label: ["Assisant Name"],
+            content: [""],
+            buttons: [
+              { name: "Cancel", class: "cancel" },
+              { name: "Create", class: "create" },
+            ],
+          },
         };
       },
     },
